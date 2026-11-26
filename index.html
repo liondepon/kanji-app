@@ -3,7 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>漢字道場＆百八霊獣伝（小学4年生・本格育成版）</title>
+  <title>漢字道場＆百八霊獣伝（小学4年生・教科書体＆本格育成版）</title>
+  <!-- とめ・はね・はらいが分かりやすい教科書体風Webフォント（Klee One） -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg-washi: #f5f1e6;
@@ -19,19 +23,28 @@
       --border-soft: #d8ceba;
       --border-strong: #b9aa8e;
       --shadow-card: 0 6px 20px rgba(29, 38, 51, 0.08);
+      /* 教科書体フォントスタック（とめ・はね・はらい重視） */
+      --font-kyokasho: "UD Digi Kyokasho N-R", "UD デジタル 教科書体 N-R", "YuKyokasho", "游教科書体", "Klee One", "Hiragino Mincho ProN", serif;
+      --font-ui: "Hiragino Maru Gothic ProN", "BIZ UDPGothic", "Meiryo", sans-serif;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     body {
       margin: 0;
-      font-family: "Hiragino Maru Gothic ProN", "BIZ UDPGothic", "Meiryo", sans-serif;
+      font-family: var(--font-ui);
       background:
         radial-gradient(circle at 12% 10%, rgba(181, 132, 40, 0.08), transparent 32%),
         radial-gradient(circle at 88% 15%, rgba(31, 58, 95, 0.08), transparent 36%),
         var(--bg-washi);
       color: var(--ink-main);
       min-height: 100vh;
+    }
+
+    /* 漢字学習用の教科書体クラス */
+    .kyokasho {
+      font-family: var(--font-kyokasho) !important;
+      font-weight: 600;
     }
 
     header {
@@ -214,8 +227,14 @@
       padding-bottom: 12px;
       margin-bottom: 16px;
     }
-    .kanji-target { font-size: 2.3rem; font-weight: 900; color: var(--ai-indigo-dark); }
-    .reading-hint { font-size: 0.92rem; color: var(--ink-sub); font-weight: 700; }
+    .kanji-target {
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: var(--ai-indigo-dark);
+      font-family: var(--font-kyokasho);
+      line-height: 1.2;
+    }
+    .reading-hint { font-size: 0.94rem; color: var(--ink-sub); font-weight: 700; margin-top: 4px; }
 
     .choice-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 14px; }
     .choice-btn {
@@ -223,8 +242,9 @@
       border: 2px solid var(--border-strong);
       border-radius: 14px;
       padding: 15px;
-      font-size: 1.05rem;
-      font-weight: 800;
+      font-size: 1.12rem;
+      font-family: var(--font-kyokasho);
+      font-weight: 600;
       color: var(--ink-main);
       cursor: pointer;
     }
@@ -295,13 +315,14 @@
       border: 1.5px solid var(--border-soft);
       border-radius: 10px;
       padding: 6px 10px;
-      min-height: 36px;
-      font-size: 1.15rem;
-      font-weight: 900;
+      min-height: 40px;
+      font-size: 1.35rem;
+      font-family: var(--font-kyokasho);
+      font-weight: 600;
       color: var(--ai-indigo-dark);
       display: flex;
       align-items: center;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.14em;
     }
     .idiom-mini-canvas {
       width: 100%;
@@ -312,15 +333,16 @@
       touch-action: none;
       display: block;
     }
-    .candidate-row { display: flex; gap: 5px; flex-wrap: wrap; min-height: 26px; align-items: center; }
+    .candidate-row { display: flex; gap: 5px; flex-wrap: wrap; min-height: 28px; align-items: center; }
     .cand-btn {
       background: #eef3fa;
       border: 1px solid #9cb3d1;
       color: var(--ai-indigo-dark);
       border-radius: 7px;
-      padding: 2px 8px;
-      font-size: 0.84rem;
-      font-weight: 800;
+      padding: 2px 9px;
+      font-size: 1rem;
+      font-family: var(--font-kyokasho);
+      font-weight: 600;
       cursor: pointer;
     }
     .judge-badge { font-size: 0.8rem; font-weight: 800; padding: 4px 8px; border-radius: 8px; }
@@ -462,7 +484,7 @@
         <span>漢字道場＆百八霊獣伝</span>
         <span class="brand-badge">小学4年生・全108種</span>
       </div>
-      <div class="brand-sub">読み方・書き順・熟語チャレンジ ／ 五能力＆スキル強化・合成・ごほうび交換</div>
+      <div class="brand-sub">教科書体（とめ・はね・はらい対応） ／ 五能力＆スキル強化・合成・ごほうび交換</div>
     </div>
     <div class="header-stats">
       <div class="stat-pill">🔥 <span id="comboCount">0</span>コンボ</div>
@@ -475,15 +497,15 @@
     <div class="verify-group">
       <span class="verify-tag">検証モード</span>
       <span>ステップ：</span>
-      <button class="v-btn" id="vStep1" onclick="jumpStep(1)">① 読み</button>
-      <button class="v-btn" id="vStep2" onclick="jumpStep(2)">② 書き順</button>
-      <button class="v-btn" id="vStep3" onclick="jumpStep(3)">③ 熟語</button>
+      <button class="v-btn" id="vStep1" onclick="KanjiModule.jumpStep(1)">① 読み</button>
+      <button class="v-btn" id="vStep2" onclick="KanjiModule.jumpStep(2)">② 書き順</button>
+      <button class="v-btn" id="vStep3" onclick="KanjiModule.jumpStep(3)">③ 熟語</button>
     </div>
     <div class="verify-group">
       <span>漢字：</span>
-      <select class="v-select" id="verifyKanjiSelect" onchange="selectVerifyKanji(this.value)"></select>
+      <select class="v-select kyokasho" id="verifyKanjiSelect" onchange="KanjiModule.selectKanji(this.value)"></select>
       <button class="v-btn" onclick="addTestCoins(1000)">🪙 +1000枚</button>
-      <button class="v-btn" onclick="addTestPartyMonsters()">🧬 素材2体追加</button>
+      <button class="v-btn" onclick="addTestPartyMonsters()">🧬 素材追加</button>
     </div>
   </div>
 
@@ -496,7 +518,7 @@
   </nav>
 
   <main class="container">
-    <!-- 1. 漢字れんしゅう -->
+    <!-- 1. 漢字れんしゅう（独立モジュール） -->
     <section id="tab-learn" class="tab-panel">
       <div class="card">
         <div class="stepper">
@@ -507,12 +529,12 @@
 
         <div class="kanji-header">
           <div>
-            <div class="kanji-target">お題の漢字：「<span id="currentKanjiChar">海</span>」</div>
-            <div class="reading-hint" id="currentKanjiReadings"></div>
+            <div class="kanji-target">お題の漢字：「<span id="currentKanjiChar" class="kyokasho">海</span>」</div>
+            <div class="reading-hint kyokasho" id="currentKanjiReadings"></div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn btn-secondary btn-sm" onclick="prevKanji()">◀ 前の漢字</button>
-            <button class="btn btn-secondary btn-sm" onclick="nextKanji()">次の漢字 ▶</button>
+            <button class="btn btn-secondary btn-sm" onclick="KanjiModule.prevKanji()">◀ 前の漢字</button>
+            <button class="btn btn-secondary btn-sm" onclick="KanjiModule.nextKanji()">次の漢字 ▶</button>
           </div>
         </div>
 
@@ -535,12 +557,12 @@
               <h3 style="margin:0 0 8px;color:var(--ai-indigo-dark);">ステップ2：正しい書き順でなぞろう</h3>
               <p id="strokeGuideText" style="font-weight:800;margin:0 0 10px;"></p>
               <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
-                <button class="btn btn-gold btn-sm" onclick="playDemoAnimation()">👀 お手本をゆっくり見る</button>
-                <button class="btn btn-secondary btn-sm" onclick="resetStrokePractice()">↺ 最初からやり直す</button>
+                <button class="btn btn-gold btn-sm" onclick="KanjiModule.playDemo()">👀 お手本をゆっくり見る</button>
+                <button class="btn btn-secondary btn-sm" onclick="KanjiModule.resetStroke()">↺ 最初からやり直す</button>
               </div>
-              <p style="font-size:0.82rem;color:var(--ink-sub);line-height:1.55;margin:0;">
-                ・緑の丸から赤い点へ向かってタッチペンや指でなぞると1画ずつ判定します。<br />
-                ・お気に入りの「スキル（書き順・学習ボーナス）」を強化すると獲得コインが増えます。
+              <p style="font-size:0.84rem;color:var(--ink-sub);line-height:1.6;margin:0;">
+                ・教科書体の「とめ・はね・はらい」を意識しながら、緑の丸から赤い点へなぞろう。<br />
+                ・お気に入りの「スキル」を強化すると獲得コインが増えます。
               </p>
             </div>
           </div>
@@ -550,12 +572,12 @@
         <div id="stepPanel3" style="display:none;">
           <h3 style="margin:0 0 6px;color:var(--ai-indigo-dark);">ステップ3：熟語チャレンジ（最大5個・自動採点）</h3>
           <p style="margin:0 0 12px;font-size:0.88rem;color:var(--ink-sub);">
-            「<strong id="idiomTargetChar">海</strong>」を使った熟語を1文字ずつ書いてね。書き終わると自動で文字になり、上の欄に順番につながるよ！
+            「<strong id="idiomTargetChar" class="kyokasho" style="font-size:1.15rem;">海</strong>」を使った熟語を1文字ずつ書いてね。書き終わると自動で教科書体になり、上の欄につながるよ！
           </p>
           <div class="idiom-list" id="idiomList"></div>
           <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-            <button class="btn btn-accent" id="btnAutoGrade" onclick="gradeAllIdioms()">🔍 5つの熟語を自動採点する！</button>
-            <button class="btn btn-primary" onclick="finishKanjiAndNext()">次の漢字へ進む ▶</button>
+            <button class="btn btn-accent" id="btnAutoGrade" onclick="KanjiModule.gradeAll()">🔍 5つの熟語を自動採点する！</button>
+            <button class="btn btn-primary" onclick="KanjiModule.nextKanji()">次の漢字へ進む ▶</button>
           </div>
         </div>
 
@@ -684,232 +706,737 @@
   </main>
 
   <script>
-    const KANJI_DATA = [
-      {
-        char: "海",
-        onyomi: "カイ",
-        kunyomi: "うみ",
-        choices: ["カイ ／ うみ", "コウ ／ かわ", "サイ ／ しま", "カイ ／ いけ"],
-        answerIndex: 0,
-        strokes: [
-          [[28, 32], [54, 52]],
-          [[22, 62], [48, 82]],
-          [[26, 128], [54, 96]],
-          [[82, 24], [64, 56]],
-          [[82, 34], [134, 30], [126, 54]],
-          [[82, 56], [126, 52]],
-          [[82, 34], [76, 84], [142, 78], [138, 124], [124, 114]],
-          [[102, 36], [98, 118]],
-          [[66, 98], [132, 94]],
-          [[60, 118], [140, 114]]
-        ]
-      },
-      {
-        char: "建",
-        onyomi: "ケン・コン",
-        kunyomi: "たてる・たつ",
-        choices: ["ケン・コン ／ たてる", "シン・ジン ／ くる", "テン・デン ／ つくる", "カン・ガン ／ こわす"],
-        answerIndex: 0,
-        strokes: [
-          [[76, 36], [128, 30], [116, 62]],
-          [[78, 64], [118, 60]],
-          [[78, 36], [78, 108], [132, 104]],
-          [[102, 63], [102, 106]],
-          [[52, 30], [32, 54], [48, 64], [30, 88], [32, 112], [62, 124], [142, 124]]
-        ]
-      },
-      {
-        char: "達",
-        onyomi: "タツ",
-        kunyomi: "たち",
-        choices: ["タツ ／ たち", "レイ ／ とどく", "チョウ ／ とぶ", "シン ／ すすむ"],
-        answerIndex: 0,
-        strokes: [
-          [[74, 34], [132, 30]],
-          [[102, 20], [102, 54]],
-          [[68, 56], [136, 52]],
-          [[86, 60], [74, 84]],
-          [[118, 58], [130, 82]],
-          [[72, 74], [134, 70], [128, 104], [74, 106]],
-          [[68, 90], [134, 86]],
-          [[50, 28], [32, 50], [48, 60], [30, 84], [34, 110], [64, 124], [144, 124]]
-        ]
-      },
-      {
-        char: "愛",
-        onyomi: "アイ",
-        kunyomi: "",
-        choices: ["アイ ／ （訓読みなし）", "エイ ／ かなしい", "ガイ ／ うれしい", "カイ ／ やさしい"],
-        answerIndex: 0,
-        strokes: [
-          [[98, 18], [98, 32]],
-          [[54, 36], [144, 32]],
-          [[72, 38], [80, 52]],
-          [[128, 36], [118, 52]],
-          [[56, 54], [56, 74], [140, 72], [140, 54]],
-          [[76, 56], [76, 72]],
-          [[116, 56], [116, 72]],
-          [[84, 76], [62, 98]],
-          [[80, 84], [124, 82], [104, 112], [62, 134]],
-          [[78, 94], [136, 132]]
-        ]
-      },
-      {
-        char: "機",
-        onyomi: "キ",
-        kunyomi: "はた",
-        choices: ["キ ／ はた", "ギ ／ もり", "ケイ ／ ほし", "コウ ／ かぜ"],
-        answerIndex: 0,
-        strokes: [
-          [[24, 58], [64, 54]],
-          [[46, 24], [46, 136]],
-          [[45, 60], [22, 98]],
-          [[47, 62], [64, 84]],
-          [[84, 28], [134, 26]],
-          [[82, 44], [134, 42]],
-          [[72, 60], [144, 58]],
-          [[92, 46], [84, 82], [136, 80], [134, 102], [86, 102]],
-          [[112, 24], [116, 128], [138, 114]]
-        ]
-      },
-      {
-        char: "関",
-        onyomi: "カン",
-        kunyomi: "せき・かかわる",
-        choices: ["カン ／ せき・かかわる", "ゲン ／ とびら", "モン ／ かど", "セン ／ しまる"],
-        answerIndex: 0,
-        strokes: [
-          [[34, 28], [34, 132]],
-          [[34, 28], [68, 26], [68, 58], [36, 58]],
-          [[36, 42], [66, 40]],
-          [[132, 26], [132, 134], [114, 122]],
-          [[98, 26], [132, 26], [132, 56], [98, 56]],
-          [[100, 40], [130, 38]],
-          [[66, 74], [104, 72]],
-          [[58, 92], [112, 88]],
-          [[84, 64], [84, 126]],
-          [[64, 104], [64, 124], [104, 122], [104, 102]]
-        ]
-      },
-      {
-        char: "選",
-        onyomi: "セン",
-        kunyomi: "えらぶ",
-        choices: ["セン ／ えらぶ", "レン ／ まねる", "ケン ／ みる", "テン ／ さがす"],
-        answerIndex: 0,
-        strokes: [
-          [[78, 28], [134, 24]],
-          [[96, 30], [88, 48]],
-          [[118, 28], [110, 48]],
-          [[76, 50], [76, 76], [136, 74], [136, 48]],
-          [[78, 62], [134, 60]],
-          [[96, 76], [76, 106]],
-          [[114, 76], [138, 104]],
-          [[88, 92], [124, 90], [118, 108], [92, 108]],
-          [[50, 28], [32, 50], [48, 60], [30, 84], [34, 110], [64, 124], [144, 124]]
-        ]
-      },
-      {
-        char: "特",
-        onyomi: "トク",
-        kunyomi: "",
-        choices: ["トク ／ （訓読みなし）", "ドク ／ わける", "コク ／ くらべる", "ソク ／ むすぶ"],
-        answerIndex: 0,
-        strokes: [
-          [[52, 28], [32, 52]],
-          [[36, 62], [68, 56]],
-          [[52, 22], [52, 134]],
-          [[30, 94], [70, 84]],
-          [[82, 36], [134, 34]],
-          [[112, 20], [112, 66]],
-          [[76, 68], [142, 64]],
-          [[88, 82], [136, 128], [120, 132]]
-        ]
-      },
-      {
-        char: "漁",
-        onyomi: "ギョ・リョウ",
-        kunyomi: "あさる",
-        choices: ["ギョ・リョウ ／ あさる", "キョ ／ しま", "リョ ／ かわ", "ショウ ／ つり"],
-        answerIndex: 0,
-        strokes: [
-          [[28, 32], [54, 52]],
-          [[22, 62], [48, 82]],
-          [[26, 128], [54, 96]],
-          [[96, 22], [72, 54]],
-          [[94, 34], [132, 32], [114, 54]],
-          [[76, 56], [76, 82], [136, 80], [136, 54]],
-          [[104, 56], [104, 80]],
-          [[78, 68], [134, 66]],
-          [[74, 96], [72, 122]],
-          [[92, 94], [94, 120]],
-          [[110, 94], [114, 118]],
-          [[128, 92], [138, 120]]
-        ]
-      },
-      {
-        char: "産",
-        onyomi: "サン",
-        kunyomi: "うむ・うまれる",
-        choices: ["サン ／ うむ・うまれる", "シン ／ そだつ", "セン ／ いのち", "ラン ／ とる"],
-        answerIndex: 0,
-        strokes: [
-          [[88, 18], [94, 34]],
-          [[46, 38], [138, 34]],
-          [[64, 42], [72, 60]],
-          [[116, 40], [106, 60]],
-          [[38, 64], [136, 60]],
-          [[52, 66], [52, 96], [132, 92]],
-          [[54, 80], [122, 76]],
-          [[88, 94], [88, 134]],
-          [[56, 112], [124, 108]],
-          [[34, 134], [144, 130]]
-        ]
-      }
-    ];
+    // =========================================================================
+    // 独立した漢字学習モジュール（他の機能追加・変更の影響を受けないカプセル化設計）
+    // =========================================================================
+    const KanjiModule = (() => {
+      const KANJI_LIST = Object.freeze([
+        { char: "海", onyomi: "カイ", kunyomi: "うみ", choices: ["カイ ／ うみ", "コウ ／ かわ", "サイ ／ しま", "カイ ／ いけ"], answerIndex: 0 },
+        { char: "建", onyomi: "ケン・コン", kunyomi: "たてる・たつ", choices: ["ケン・コン ／ たてる", "シン・ジン ／ くる", "テン・デン ／ つくる", "カン・ガン ／ こわす"], answerIndex: 0 },
+        { char: "達", onyomi: "タツ", kunyomi: "たち", choices: ["タツ ／ たち", "レイ ／ とどく", "チョウ ／ とぶ", "シン ／ すすむ"], answerIndex: 0 },
+        { char: "愛", onyomi: "アイ", kunyomi: "", choices: ["アイ ／ （訓読みなし）", "エイ ／ かなしい", "ガイ ／ うれしい", "カイ ／ やさしい"], answerIndex: 0 },
+        { char: "機", onyomi: "キ", kunyomi: "はた", choices: ["キ ／ はた", "ギ ／ もり", "ケイ ／ ほし", "コウ ／ かぜ"], answerIndex: 0 },
+        { char: "関", onyomi: "カン", kunyomi: "せき・かかわる", choices: ["カン ／ せき・かかわる", "ゲン ／ とびら", "モン ／ かど", "セン ／ しまる"], answerIndex: 0 },
+        { char: "選", onyomi: "セン", kunyomi: "えらぶ", choices: ["セン ／ えらぶ", "レン ／ まねる", "ケン ／ みる", "テン ／ さがす"], answerIndex: 0 },
+        { char: "特", onyomi: "トク", kunyomi: "", choices: ["トク ／ （訓読みなし）", "ドク ／ わける", "コク ／ くらべる", "ソク ／ むすぶ"], answerIndex: 0 },
+        { char: "漁", onyomi: "ギョ・リョウ", kunyomi: "あさる", choices: ["ギョ・リョウ ／ あさる", "キョ ／ しま", "リョ ／ かわ", "ショウ ／ つり"], answerIndex: 0 },
+        { char: "産", onyomi: "サン", kunyomi: "うむ・うまれる", choices: ["サン ／ うむ・うまれる", "シン ／ そだつ", "セン ／ いのち", "ラン ／ とる"], answerIndex: 0 }
+      ]);
 
+      const LOCAL_IDIOMS = new Set([
+        "海原", "海外", "海岸", "海辺", "海底", "海面", "海水", "海風", "海洋", "海戦", "海賊", "日本海", "瀬戸内海", "深海", "南海", "北海", "東海", "臨海",
+        "建築", "建設", "建物", "建造", "再建", "新建", "建て前",
+        "発達", "到達", "伝達", "達人", "上達", "未達", "速達", "配達",
+        "愛情", "愛着", "愛読", "愛犬", "愛車", "愛国", "純愛", "慈愛", "恋愛", "友愛",
+        "機械", "機関", "機能", "危機", "機会", "飛行機", "電機", "動機", "有機", "無機",
+        "関係", "関心", "関連", "関所", "玄関", "無関心", "関門",
+        "選択", "選手", "当選", "選挙", "選出", "精選", "特選", "選抜", "厳選",
+        "特別", "特殊", "特急", "特技", "特徴", "特産", "特権", "特訓", "特売",
+        "漁業", "漁港", "漁師", "漁船", "漁場", "漁獲", "遠洋漁業", "定置漁業",
+        "生産", "産業", "水産", "畜産", "農産", "産物", "出産", "原産", "特産", "国産", "財産"
+      ]);
+
+      // 標準書き順ベクターキャッシュ（KanjiVG SVGデータを自動取得）
+      const strokeCache = {};
+      let kanjiIndex = 0;
+      let step = 1;
+      let strokeCanvas = null;
+      let strokeCtx = null;
+      let canvasSize = 320;
+      let activeStrokes = []; // [{ path2d, points: [{x,y}, ...] }]
+      let currentStrokeIdx = 0;
+      let isDrawing = false;
+      let userPoints = [];
+      let isDemoPlaying = false;
+
+      const idiomSlots = Array.from({ length: 5 }, () => ({
+        word: "",
+        candidates: [],
+        currentStrokes: [],
+        timer: null,
+        judgeText: "",
+        judgeClass: ""
+      }));
+
+      // KanjiVG から正規の筆順パス（109x109座標系）を取得して高精度サンプリング
+      async function fetchKanjiStrokes(char) {
+        if (strokeCache[char]) return strokeCache[char];
+        const hex = char.codePointAt(0).toString(16).padStart(5, "0");
+        const url = `https://cdn.jsdelivr.net/gh/KanjiVG/kanjivg@master/kanji/${hex}.svg`;
+        try {
+          const res = await fetch(url);
+          if (!res.ok) throw new Error("fetch failed");
+          const svgText = await res.text();
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(svgText, "image/svg+xml");
+          const paths = Array.from(doc.querySelectorAll("path[d]"));
+          if (paths.length === 0) throw new Error("no paths");
+
+          const svgEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+          svgEl.setAttribute("viewBox", "0 0 109 109");
+          svgEl.style.position = "fixed";
+          svgEl.style.left = "-9999px";
+          svgEl.style.width = "109px";
+          svgEl.style.height = "109px";
+          document.body.appendChild(svgEl);
+
+          const parsedStrokes = paths.map(p => {
+            const d = p.getAttribute("d");
+            const clone = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            clone.setAttribute("d", d);
+            svgEl.appendChild(clone);
+            const totalLen = clone.getTotalLength();
+            const steps = Math.max(12, Math.ceil(totalLen / 3));
+            const pts = [];
+            for (let i = 0; i <= steps; i++) {
+              const pt = clone.getPointAtLength((totalLen * i) / steps);
+              pts.push({ x: pt.x / 109, y: pt.y / 109 });
+            }
+            return { d, pts };
+          });
+
+          document.body.removeChild(svgEl);
+          strokeCache[char] = parsedStrokes;
+          return parsedStrokes;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function setupCanvas() {
+        strokeCanvas = document.getElementById("strokeCanvas");
+        if (!strokeCanvas) return;
+        const rect = strokeCanvas.getBoundingClientRect();
+        canvasSize = Math.max(240, Math.round(rect.width || 320));
+        const dpr = window.devicePixelRatio || 1;
+        strokeCanvas.width = Math.round(canvasSize * dpr);
+        strokeCanvas.height = Math.round(canvasSize * dpr);
+        strokeCtx = strokeCanvas.getContext("2d");
+        strokeCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        strokeCanvas.onpointerdown = onPointerDown;
+        strokeCanvas.onpointermove = onPointerMove;
+        strokeCanvas.onpointerup = onPointerUp;
+        strokeCanvas.onpointercancel = onPointerUp;
+      }
+
+      function drawGrid(ctx, s) {
+        ctx.save();
+        ctx.strokeStyle = "#e5dec9";
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([6, 6]);
+        ctx.beginPath();
+        ctx.moveTo(s / 2, 8); ctx.lineTo(s / 2, s - 8);
+        ctx.moveTo(8, s / 2); ctx.lineTo(s - 8, s / 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // 教科書体フォントの正しい字形を薄く背景に敷き、その上に正規筆順を描画
+      function drawKyokashoWatermark(ctx, s, char) {
+        ctx.save();
+        ctx.fillStyle = "#ece5d5";
+        ctx.font = `600 ${Math.round(s * 0.78)}px "UD Digi Kyokasho N-R", "UD デジタル 教科書体 N-R", "YuKyokasho", "游教科書体", "Klee One", serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(char, s / 2, s / 2 + s * 0.03);
+        ctx.restore();
+      }
+
+      function renderCanvas(demoOverride = null) {
+        if (!strokeCtx) setupCanvas();
+        if (!strokeCtx) return;
+        const s = canvasSize;
+        const ctx = strokeCtx;
+        const k = KANJI_LIST[kanjiIndex];
+
+        ctx.clearRect(0, 0, s, s);
+        drawGrid(ctx, s);
+        drawKyokashoWatermark(ctx, s, k.char);
+
+        if (!activeStrokes || activeStrokes.length === 0) {
+          document.getElementById("strokeGuideText").textContent = "教科書体の形を見ながら、正しい書き順で書いてみよう！";
+          return;
+        }
+
+        const pad = s * 0.09;
+        const inner = s - pad * 2;
+        const toPx = pt => ({ x: pad + pt.x * inner, y: pad + pt.y * inner });
+
+        // 完了済みの画（藍色）
+        ctx.save();
+        ctx.strokeStyle = "#1f3a5f";
+        ctx.lineWidth = Math.max(9, s * 0.034);
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        for (let i = 0; i < currentStrokeIdx && i < activeStrokes.length; i++) {
+          const pts = activeStrokes[i].pts;
+          ctx.beginPath();
+          pts.forEach((p, idx) => {
+            const q = toPx(p);
+            idx === 0 ? ctx.moveTo(q.x, q.y) : ctx.lineTo(q.x, q.y);
+          });
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        // お手本再生中
+        if (demoOverride) {
+          ctx.save();
+          ctx.strokeStyle = "#b83a2d";
+          ctx.lineWidth = Math.max(9, s * 0.034);
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+          demoOverride.forEach(pts => {
+            if (!pts || pts.length === 0) return;
+            ctx.beginPath();
+            pts.forEach((p, idx) => {
+              const q = toPx(p);
+              idx === 0 ? ctx.moveTo(q.x, q.y) : ctx.lineTo(q.x, q.y);
+            });
+            ctx.stroke();
+          });
+          ctx.restore();
+        } else if (currentStrokeIdx < activeStrokes.length) {
+          // 次の画の薄いガイド線＋緑の始点＆赤の終点
+          const curPts = activeStrokes[currentStrokeIdx].pts;
+          ctx.save();
+          ctx.strokeStyle = "rgba(44, 110, 73, 0.25)";
+          ctx.lineWidth = Math.max(10, s * 0.036);
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+          ctx.beginPath();
+          curPts.forEach((p, idx) => {
+            const q = toPx(p);
+            idx === 0 ? ctx.moveTo(q.x, q.y) : ctx.lineTo(q.x, q.y);
+          });
+          ctx.stroke();
+
+          const st = toPx(curPts[0]);
+          const ed = toPx(curPts[curPts.length - 1]);
+
+          ctx.fillStyle = "#2c6e49";
+          ctx.beginPath();
+          ctx.arc(st.x, st.y, 13, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "bold 12px sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(String(currentStrokeIdx + 1), st.x, st.y);
+
+          ctx.fillStyle = "#b83a2d";
+          ctx.beginPath();
+          ctx.arc(ed.x, ed.y, 6.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        // ユーザー描画中の軌跡
+        if (userPoints.length > 1) {
+          ctx.save();
+          ctx.strokeStyle = "#2c6e49";
+          ctx.lineWidth = Math.max(8, s * 0.03);
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+          ctx.beginPath();
+          userPoints.forEach((p, idx) => idx === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        const rem = Math.max(0, activeStrokes.length - currentStrokeIdx);
+        document.getElementById("strokeGuideText").textContent =
+          rem > 0
+            ? `${currentStrokeIdx + 1}画目：緑の「${currentStrokeIdx + 1}」から赤い点へなぞろう（あと ${rem} 画）`
+            : `全${activeStrokes.length}画 完成！`;
+      }
+
+      function getPos(e) {
+        const rect = strokeCanvas.getBoundingClientRect();
+        return {
+          x: ((e.clientX - rect.left) / rect.width) * canvasSize,
+          y: ((e.clientY - rect.top) / rect.height) * canvasSize
+        };
+      }
+
+      function onPointerDown(e) {
+        if (isDemoPlaying) return;
+        e.preventDefault();
+        strokeCanvas.setPointerCapture(e.pointerId);
+        isDrawing = true;
+        userPoints = [getPos(e)];
+        renderCanvas();
+      }
+
+      function onPointerMove(e) {
+        if (!isDrawing || isDemoPlaying) return;
+        e.preventDefault();
+        userPoints.push(getPos(e));
+        renderCanvas();
+      }
+
+      function onPointerUp() {
+        if (!isDrawing) return;
+        isDrawing = false;
+        if (!activeStrokes || currentStrokeIdx >= activeStrokes.length) return;
+
+        const pad = canvasSize * 0.09;
+        const inner = canvasSize - pad * 2;
+        const curPts = activeStrokes[currentStrokeIdx].pts;
+        const st = { x: pad + curPts[0].x * inner, y: pad + curPts[0].y * inner };
+        const ed = { x: pad + curPts[curPts.length - 1].x * inner, y: pad + curPts[curPts.length - 1].y * inner };
+        const tol = canvasSize * 0.22;
+
+        if (userPoints.length >= 2) {
+          const uSt = userPoints[0];
+          const uEd = userPoints[userPoints.length - 1];
+          const d1 = Math.hypot(uSt.x - st.x, uSt.y - st.y);
+          const d2 = Math.hypot(uEd.x - ed.x, uEd.y - ed.y);
+          if (d1 <= tol && d2 <= tol) {
+            currentStrokeIdx += 1;
+            userPoints = [];
+            renderCanvas();
+            if (currentStrokeIdx >= activeStrokes.length) {
+              const earned = window.onKanjiReward ? window.onKanjiReward(25, "stroke") : 25;
+              showBanner("learnFeedback", `🎉 書き順クリア！+${earned}コイン獲得！ステップ3（熟語チャレンジ）へ進むよ。`, true);
+              setTimeout(() => setStep(3), 900);
+            }
+            return;
+          }
+        }
+        userPoints = [];
+        renderCanvas();
+        showBanner("learnFeedback", "💡 緑の数字から赤い点に向かって、もう少し近づけてなぞってみよう！", false);
+      }
+
+      function playDemo() {
+        if (isDemoPlaying || !activeStrokes || activeStrokes.length === 0) return;
+        isDemoPlaying = true;
+        let sIdx = 0;
+        let pIdx = 0;
+        const drawn = [];
+
+        function tick() {
+          if (!isDemoPlaying) return;
+          if (sIdx >= activeStrokes.length) {
+            isDemoPlaying = false;
+            setTimeout(() => renderCanvas(), 500);
+            return;
+          }
+          const pts = activeStrokes[sIdx].pts;
+          if (!drawn[sIdx]) drawn[sIdx] = [];
+          drawn[sIdx].push(pts[pIdx]);
+          renderCanvas(drawn);
+          pIdx += 2;
+          if (pIdx >= pts.length) {
+            drawn[sIdx] = pts.slice();
+            renderCanvas(drawn);
+            sIdx += 1;
+            pIdx = 0;
+            setTimeout(tick, 220);
+          } else {
+            setTimeout(tick, 45);
+          }
+        }
+        tick();
+      }
+
+      async function resetStroke() {
+        currentStrokeIdx = 0;
+        userPoints = [];
+        isDemoPlaying = false;
+        setupCanvas();
+        const k = KANJI_LIST[kanjiIndex];
+        activeStrokes = await fetchKanjiStrokes(k.char);
+        renderCanvas();
+      }
+
+      function initIdiomSlots() {
+        idiomSlots.forEach(sl => {
+          clearTimeout(sl.timer);
+          sl.word = "";
+          sl.candidates = [];
+          sl.currentStrokes = [];
+          sl.judgeText = "";
+          sl.judgeClass = "";
+        });
+        renderIdiomList();
+      }
+
+      function renderIdiomList() {
+        const listEl = document.getElementById("idiomList");
+        if (!listEl) return;
+        listEl.innerHTML = "";
+        idiomSlots.forEach((sl, idx) => {
+          const card = document.createElement("div");
+          card.className = "idiom-card";
+
+          const topRow = document.createElement("div");
+          topRow.className = "idiom-top-row";
+          const wordBox = document.createElement("div");
+          wordBox.className = "idiom-word-display kyokasho";
+          wordBox.textContent = sl.word || "（1文字ずつ書いてね）";
+          topRow.appendChild(wordBox);
+
+          if (sl.judgeText) {
+            const badge = document.createElement("span");
+            badge.className = "judge-badge " + sl.judgeClass;
+            badge.textContent = sl.judgeText;
+            topRow.appendChild(badge);
+          }
+          card.appendChild(topRow);
+
+          const candRow = document.createElement("div");
+          candRow.className = "candidate-row";
+          if (sl.candidates.length > 0 && sl.word.length > 0) {
+            const lbl = document.createElement("span");
+            lbl.style.fontSize = "0.75rem";
+            lbl.style.color = "var(--ink-sub)";
+            lbl.textContent = "最後の1字を変更：";
+            candRow.appendChild(lbl);
+            sl.candidates.slice(0, 5).forEach(ch => {
+              const cBtn = document.createElement("button");
+              cBtn.className = "cand-btn kyokasho";
+              cBtn.textContent = ch;
+              cBtn.onclick = () => {
+                sl.word = sl.word.slice(0, -1) + ch;
+                renderIdiomList();
+                initIdiomCanvases();
+              };
+              candRow.appendChild(cBtn);
+            });
+          }
+          card.appendChild(candRow);
+
+          const cvs = document.createElement("canvas");
+          cvs.className = "idiom-mini-canvas";
+          cvs.dataset.slot = String(idx);
+          card.appendChild(cvs);
+
+          const btnRow = document.createElement("div");
+          btnRow.style.display = "flex";
+          btnRow.style.gap = "6px";
+          btnRow.style.flexWrap = "wrap";
+
+          const bClearCur = document.createElement("button");
+          bClearCur.className = "btn btn-secondary btn-sm";
+          bClearCur.textContent = "いまの字を消す";
+          bClearCur.onclick = () => {
+            clearTimeout(sl.timer);
+            sl.currentStrokes = [];
+            redrawIdiomCanvas(idx);
+          };
+
+          const bBack = document.createElement("button");
+          bBack.className = "btn btn-secondary btn-sm";
+          bBack.textContent = "1字もどす";
+          bBack.onclick = () => {
+            sl.word = sl.word.slice(0, -1);
+            sl.judgeText = "";
+            renderIdiomList();
+            initIdiomCanvases();
+          };
+
+          const bAll = document.createElement("button");
+          bAll.className = "btn btn-secondary btn-sm";
+          bAll.textContent = "全部消す";
+          bAll.onclick = () => {
+            clearTimeout(sl.timer);
+            sl.word = "";
+            sl.candidates = [];
+            sl.currentStrokes = [];
+            sl.judgeText = "";
+            renderIdiomList();
+            initIdiomCanvases();
+          };
+
+          btnRow.append(bClearCur, bBack, bAll);
+          card.appendChild(btnRow);
+          listEl.appendChild(card);
+        });
+        initIdiomCanvases();
+      }
+
+      function initIdiomCanvases() {
+        document.querySelectorAll(".idiom-mini-canvas").forEach(cvs => {
+          const idx = Number(cvs.dataset.slot);
+          const rect = cvs.getBoundingClientRect();
+          const w = Math.max(180, Math.round(rect.width || 240));
+          const h = Math.max(96, Math.round(rect.height || 118));
+          cvs.width = w;
+          cvs.height = h;
+          redrawIdiomCanvas(idx);
+
+          let drawing = false;
+          cvs.onpointerdown = e => {
+            e.preventDefault();
+            cvs.setPointerCapture(e.pointerId);
+            drawing = true;
+            clearTimeout(idiomSlots[idx].timer);
+            idiomSlots[idx].currentStrokes.push([{ x: e.offsetX, y: e.offsetY }]);
+            redrawIdiomCanvas(idx);
+          };
+          cvs.onpointermove = e => {
+            if (!drawing) return;
+            e.preventDefault();
+            const cur = idiomSlots[idx].currentStrokes;
+            cur[cur.length - 1].push({ x: e.offsetX, y: e.offsetY });
+            redrawIdiomCanvas(idx);
+          };
+          cvs.onpointerup = () => {
+            if (!drawing) return;
+            drawing = false;
+            clearTimeout(idiomSlots[idx].timer);
+            idiomSlots[idx].timer = setTimeout(() => recognizeChar(idx), 650);
+          };
+        });
+      }
+
+      function redrawIdiomCanvas(idx) {
+        const cvs = document.querySelector(`.idiom-mini-canvas[data-slot="${idx}"]`);
+        if (!cvs) return;
+        const ctx = cvs.getContext("2d");
+        ctx.clearRect(0, 0, cvs.width, cvs.height);
+        ctx.save();
+        ctx.strokeStyle = "#1d2633";
+        ctx.lineWidth = 6;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        idiomSlots[idx].currentStrokes.forEach(st => {
+          if (st.length < 2) return;
+          ctx.beginPath();
+          st.forEach((pt, i) => i === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y));
+          ctx.stroke();
+        });
+        ctx.restore();
+      }
+
+      async function recognizeChar(idx) {
+        const sl = idiomSlots[idx];
+        if (!sl.currentStrokes.length) return;
+        const cvs = document.querySelector(`.idiom-mini-canvas[data-slot="${idx}"]`);
+        const w = cvs ? cvs.width : 240;
+        const h = cvs ? cvs.height : 118;
+
+        const ink = sl.currentStrokes.map(st => [
+          st.map(p => Math.round(p.x)),
+          st.map(p => Math.round(p.y)),
+          st.map((_, i) => i * 25)
+        ]);
+
+        let cands = [];
+        try {
+          const res = await fetch("https://inputtools.google.com/request?itc=ja-t-i0-handwrit&app=test", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              options: "enable_pre_space",
+              requests: [{ writing_guide: { writing_area_width: w, writing_area_height: h }, ink, max_completions: 6, max_num_results: 6 }]
+            })
+          });
+          const data = await res.json();
+          if (data && data[0] === "SUCCESS" && data[1]?.[0]?.[1]) {
+            cands = data[1][0][1].map(s => s[0]).filter(Boolean);
+          }
+        } catch (e) {}
+
+        if (!cands.length) cands = [KANJI_LIST[kanjiIndex].char, "日", "本", "山", "川"];
+        sl.candidates = cands;
+        sl.word += cands[0];
+        sl.currentStrokes = [];
+        renderIdiomList();
+      }
+
+      async function isRealWord(word) {
+        if (LOCAL_IDIOMS.has(word)) return true;
+        try {
+          const res = await fetch("https://jisho.org/api/v1/search/words?keyword=" + encodeURIComponent(word));
+          const data = await res.json();
+          if (Array.isArray(data.data)) {
+            return data.data.some(item =>
+              Array.isArray(item.japanese) && item.japanese.some(j => j.word === word || j.reading === word)
+            );
+          }
+        } catch (e) {
+          return false;
+        }
+        return false;
+      }
+
+      async function gradeAll() {
+        const targetChar = KANJI_LIST[kanjiIndex].char;
+        const seen = new Set();
+        let correctCount = 0;
+
+        for (let i = 0; i < idiomSlots.length; i++) {
+          const sl = idiomSlots[i];
+          const w = sl.word.trim();
+          if (!w) { sl.judgeText = ""; sl.judgeClass = ""; continue; }
+          if (w.length < 2) { sl.judgeText = "❌ 2文字以上"; sl.judgeClass = "judge-ng"; continue; }
+          if (!w.includes(targetChar)) { sl.judgeText = `❌ 「${targetChar}」なし`; sl.judgeClass = "judge-ng"; continue; }
+          if (seen.has(w)) { sl.judgeText = "⚠️ 重複"; sl.judgeClass = "judge-warn"; continue; }
+          seen.add(w);
+
+          sl.judgeText = "確認中...";
+          sl.judgeClass = "judge-warn";
+          renderIdiomList();
+
+          const valid = await isRealWord(w);
+          if (valid) {
+            sl.judgeText = "⭕ 正解！";
+            sl.judgeClass = "judge-ok";
+            correctCount += 1;
+          } else {
+            sl.judgeText = "❌ 未登録語";
+            sl.judgeClass = "judge-ng";
+          }
+        }
+
+        renderIdiomList();
+        if (correctCount > 0) {
+          const bonus5 = correctCount === 5 ? 35 : 0;
+          const earned = window.onKanjiReward ? window.onKanjiReward(correctCount * 15 + bonus5, "idiom") : (correctCount * 15 + bonus5);
+          showBanner("learnFeedback", `🏆 ${correctCount}個の熟語が正解！+${earned}コイン獲得（5個達成ボーナス：+${bonus5}）！`, true);
+        } else {
+          showBanner("learnFeedback", `「${targetChar}」を含む実在の熟語（2文字以上）を書いてもう一度自動採点してみよう！`, false);
+        }
+      }
+
+      function setStep(stepNum) {
+        step = stepNum;
+        [1, 2, 3].forEach(n => {
+          document.getElementById("stepPanel" + n).style.display = n === stepNum ? "block" : "none";
+          const ind = document.getElementById("stepInd" + n);
+          ind.classList.remove("active", "done");
+          if (n < stepNum) ind.classList.add("done");
+          else if (n === stepNum) ind.classList.add("active");
+          const vBtn = document.getElementById("vStep" + n);
+          if (vBtn) vBtn.classList.toggle("active", n === stepNum);
+        });
+        if (stepNum === 2) {
+          setTimeout(() => { setupCanvas(); renderCanvas(); }, 40);
+        }
+        if (stepNum === 3) {
+          setTimeout(() => initIdiomCanvases(), 40);
+        }
+      }
+
+      function checkReading(idx, btn) {
+        const k = KANJI_LIST[kanjiIndex];
+        const allBtns = document.querySelectorAll("#choiceGrid .choice-btn");
+        allBtns.forEach(b => b.disabled = true);
+
+        if (idx === k.answerIndex) {
+          btn.classList.add("correct");
+          const earned = window.onKanjiReward ? window.onKanjiReward(15, "read") : 15;
+          showBanner("learnFeedback", `⭕ 正解！+${earned}コイン獲得！ステップ2（書き順）へ進むよ。`, true);
+          setTimeout(() => setStep(2), 850);
+        } else {
+          btn.classList.add("wrong");
+          allBtns[k.answerIndex].classList.add("correct");
+          if (window.onKanjiMiss) window.onKanjiMiss();
+          showBanner("learnFeedback", `❌ 残念！正解は「${k.choices[k.answerIndex]}」。ステップ2で書き順を練習しよう！`, false);
+          setTimeout(() => setStep(2), 1400);
+        }
+      }
+
+      async function loadQuestion(targetStep = 1) {
+        const k = KANJI_LIST[kanjiIndex];
+        document.getElementById("currentKanjiChar").textContent = k.char;
+        document.getElementById("currentKanjiReadings").textContent = `音読み：${k.onyomi} ／ 訓読み：${k.kunyomi || "なし"}`;
+        document.getElementById("idiomTargetChar").textContent = k.char;
+        const sel = document.getElementById("verifyKanjiSelect");
+        if (sel) sel.value = String(kanjiIndex);
+        hideBanner("learnFeedback");
+
+        const grid = document.getElementById("choiceGrid");
+        grid.innerHTML = "";
+        k.choices.forEach((choice, idx) => {
+          const btn = document.createElement("button");
+          btn.className = "choice-btn kyokasho";
+          btn.textContent = choice;
+          btn.onclick = () => checkReading(idx, btn);
+          grid.appendChild(btn);
+        });
+
+        initIdiomSlots();
+        setStep(targetStep);
+        await resetStroke();
+      }
+
+      function init() {
+        const sel = document.getElementById("verifyKanjiSelect");
+        if (sel) {
+          sel.innerHTML = KANJI_LIST.map((k, idx) => `<option value="${idx}">${idx + 1}. ${k.char}（${k.onyomi}）</option>`).join("");
+        }
+        loadQuestion(1);
+        window.addEventListener("resize", () => {
+          if (document.getElementById("tab-learn").style.display !== "none" && step === 2) {
+            setupCanvas();
+            renderCanvas();
+          }
+        });
+      }
+
+      return {
+        init,
+        jumpStep: s => { switchTab("learn"); setStep(s); },
+        selectKanji: idx => { kanjiIndex = Number(idx) || 0; loadQuestion(step); },
+        prevKanji: () => { kanjiIndex = (kanjiIndex - 1 + KANJI_LIST.length) % KANJI_LIST.length; loadQuestion(1); },
+        nextKanji: () => { kanjiIndex = (kanjiIndex + 1) % KANJI_LIST.length; loadQuestion(1); },
+        playDemo,
+        resetStroke,
+        gradeAll,
+        onTabShown: () => { if (step === 2) { setupCanvas(); renderCanvas(); } }
+      };
+    })();
+
+    // =========================================================================
+    // 育成・図鑑・合成・ごほうびモジュール（漢字モジュールから完全分離）
+    // =========================================================================
     const BASE_LINEAGES = [
-      { id: "ryu", shape: "dragon", group: "幻獣", title: "蒼穹龍", skill: "天龍の筆致", bonusType: "all", bonusVal: 4, colors: ["#1e3a8a", "#38bdf8", "#fde047"] },
-      { id: "kirin", shape: "beast", group: "幻獣", title: "黄金麒麟", skill: "瑞兆の知識", bonusType: "idiom", bonusVal: 6, colors: ["#92400e", "#f59e0b", "#fef08a"] },
-      { id: "houou", shape: "bird", group: "幻獣", title: "紅蓮鳳凰", skill: "不死鳥の気迫", bonusType: "stroke", bonusVal: 5, colors: ["#991b1b", "#f43f5e", "#fde047"] },
-      { id: "genbu", shape: "turtle", group: "幻獣", title: "玄武甲獣", skill: "堅牢なる学び", bonusType: "read", bonusVal: 5, colors: ["#1e3a8a", "#0d9488", "#a7f3d0"] },
-      { id: "byakko", shape: "beast", group: "幻獣", title: "白虎神獣", skill: "疾風の閃き", bonusType: "idiom", bonusVal: 5, colors: ["#334155", "#f8fafc", "#38bdf8"] },
-      { id: "hakutaku", shape: "beast", group: "幻獣", title: "白澤霊獣", skill: "万象の知恵", bonusType: "all", bonusVal: 5, colors: ["#065f46", "#34d399", "#fef9c3"] },
-      { id: "kyubi", shape: "fox", group: "妖怪", title: "妖狐九尾", skill: "幻惑の言霊", bonusType: "idiom", bonusVal: 6, colors: ["#9d174d", "#f472b6", "#fde68a"] },
-      { id: "tengu", shape: "bird", group: "妖怪", title: "嵐山天狗", skill: "神通の眼力", bonusType: "stroke", bonusVal: 5, colors: ["#7f1d1d", "#ef4444", "#fcd34d"] },
-      { id: "nurari", shape: "oni", group: "妖怪", title: "夜行総大将", skill: "百鬼の統率", bonusType: "all", bonusVal: 4, colors: ["#312e81", "#818cf8", "#fde047"] },
-      { id: "kamaitachi", shape: "fox", group: "妖怪", title: "疾風鎌鼬", skill: "瞬筆の刃", bonusType: "stroke", bonusVal: 6, colors: ["#0f766e", "#2dd4bf", "#e0f2fe"] },
-      { id: "yuki", shape: "spirit", group: "妖怪", title: "雪女氷姫", skill: "静寂の集中", bonusType: "read", bonusVal: 6, colors: ["#0369a1", "#bae6fd", "#ffffff"] },
-      { id: "oni", shape: "oni", group: "妖怪", title: "剛腕鬼神", skill: "鉄壁の鍛錬", bonusType: "stroke", bonusVal: 5, colors: ["#991b1b", "#ea580c", "#fde047"] },
-      { id: "kodama", shape: "spirit", group: "精霊", title: "古森木霊", skill: "森羅の息吹", bonusType: "read", bonusVal: 5, colors: ["#166534", "#4ade80", "#fef08a"] },
-      { id: "mizuchi", shape: "dragon", group: "精霊", title: "清流龍精", skill: "水鏡の洞察", bonusType: "idiom", bonusVal: 5, colors: ["#0284c7", "#67e8f9", "#ffffff"] },
-      { id: "hikari", shape: "spirit", group: "精霊", title: "星辰光精", skill: "星詠みの記憶", bonusType: "all", bonusVal: 5, colors: ["#4338ca", "#c084fc", "#fef08a"] },
-      { id: "kaze", shape: "bird", group: "精霊", title: "旋風羽精", skill: "空駆ける軽さ", bonusType: "stroke", bonusVal: 4, colors: ["#0d9488", "#99f6e4", "#fffbeb"] },
-      { id: "tsuchi", shape: "turtle", group: "精霊", title: "大地岩精", skill: "揺るがぬ土台", bonusType: "read", bonusVal: 5, colors: ["#78350f", "#d97706", "#fef3c7"] },
-      { id: "hi", shape: "spirit", group: "精霊", title: "陽炎火精", skill: "燃える探究心", bonusType: "idiom", bonusVal: 5, colors: ["#c2410c", "#fb923c", "#fef08a"] }
+      { id: "ryu", group: "幻獣", title: "蒼穹龍", skill: "天龍の筆致", bonusType: "all", bonusVal: 4, colors: ["#1e3a8a", "#38bdf8", "#fde047"] },
+      { id: "kirin", group: "幻獣", title: "黄金麒麟", skill: "瑞兆の知識", bonusType: "idiom", bonusVal: 6, colors: ["#92400e", "#f59e0b", "#fef08a"] },
+      { id: "houou", group: "幻獣", title: "紅蓮鳳凰", skill: "不死鳥の気迫", bonusType: "stroke", bonusVal: 5, colors: ["#991b1b", "#f43f5e", "#fde047"] },
+      { id: "genbu", group: "幻獣", title: "玄武甲獣", skill: "堅牢なる学び", bonusType: "read", bonusVal: 5, colors: ["#1e3a8a", "#0d9488", "#a7f3d0"] },
+      { id: "byakko", group: "幻獣", title: "白虎神獣", skill: "疾風の閃き", bonusType: "idiom", bonusVal: 5, colors: ["#334155", "#f8fafc", "#38bdf8"] },
+      { id: "hakutaku", group: "幻獣", title: "白澤霊獣", skill: "万象の知恵", bonusType: "all", bonusVal: 5, colors: ["#065f46", "#34d399", "#fef9c3"] },
+      { id: "kyubi", group: "妖怪", title: "妖狐九尾", skill: "幻惑の言霊", bonusType: "idiom", bonusVal: 6, colors: ["#9d174d", "#f472b6", "#fde68a"] },
+      { id: "tengu", group: "妖怪", title: "嵐山天狗", skill: "神通の眼力", bonusType: "stroke", bonusVal: 5, colors: ["#7f1d1d", "#ef4444", "#fcd34d"] },
+      { id: "nurari", group: "妖怪", title: "夜行総大将", skill: "百鬼の統率", bonusType: "all", bonusVal: 4, colors: ["#312e81", "#818cf8", "#fde047"] },
+      { id: "kamaitachi", group: "妖怪", title: "疾風鎌鼬", skill: "瞬筆の刃", bonusType: "stroke", bonusVal: 6, colors: ["#0f766e", "#2dd4bf", "#e0f2fe"] },
+      { id: "yuki", group: "妖怪", title: "雪女氷姫", skill: "静寂の集中", bonusType: "read", bonusVal: 6, colors: ["#0369a1", "#bae6fd", "#ffffff"] },
+      { id: "oni", group: "妖怪", title: "剛腕鬼神", skill: "鉄壁の鍛錬", bonusType: "stroke", bonusVal: 5, colors: ["#991b1b", "#ea580c", "#fde047"] },
+      { id: "kodama", group: "精霊", title: "古森木霊", skill: "森羅の息吹", bonusType: "read", bonusVal: 5, colors: ["#166534", "#4ade80", "#fef08a"] },
+      { id: "mizuchi", group: "精霊", title: "清流龍精", skill: "水鏡の洞察", bonusType: "idiom", bonusVal: 5, colors: ["#0284c7", "#67e8f9", "#ffffff"] },
+      { id: "hikari", group: "精霊", title: "星辰光精", skill: "星詠みの記憶", bonusType: "all", bonusVal: 5, colors: ["#4338ca", "#c084fc", "#fef08a"] },
+      { id: "kaze", group: "精霊", title: "旋風羽精", skill: "空駆ける軽さ", bonusType: "stroke", bonusVal: 4, colors: ["#0d9488", "#99f6e4", "#fffbeb"] },
+      { id: "tsuchi", group: "精霊", title: "大地岩精", skill: "揺るがぬ土台", bonusType: "read", bonusVal: 5, colors: ["#78350f", "#d97706", "#fef3c7"] },
+      { id: "hi", group: "精霊", title: "陽炎火精", skill: "燃える探究心", bonusType: "idiom", bonusVal: 5, colors: ["#c2410c", "#fb923c", "#fef08a"] }
     ];
 
     const STAGE_LABELS = ["タマゴ", "幼体", "成長体", "覚醒体", "究極体"];
 
     const FUSION_RECIPES = [
-      { id: "f_01", shape: "dragon", p1: "ryu", p2: "houou", group: "合成", name: "天翔皇龍鳳", skill: "皇天の双翼", bonusType: "all", bonusVal: 8, colors: ["#b91c1c", "#1d4ed8", "#facc15"] },
-      { id: "f_02", shape: "fox", p1: "kyubi", p2: "tengu", group: "合成", name: "魔界妖帝", skill: "妖術の極意", bonusType: "idiom", bonusVal: 9, colors: ["#581c87", "#e11d48", "#fde047"] },
-      { id: "f_03", shape: "spirit", p1: "kodama", p2: "mizuchi", group: "合成", name: "翠水聖霊王", skill: "聖域の加護", bonusType: "all", bonusVal: 8, colors: ["#047857", "#0284c7", "#fef08a"] },
-      { id: "f_04", shape: "beast", p1: "kirin", p2: "hakutaku", group: "合成", name: "賢聖瑞獣", skill: "叡智の啓示", bonusType: "read", bonusVal: 9, colors: ["#a16207", "#059669", "#ffffff"] },
-      { id: "f_05", shape: "beast", p1: "byakko", p2: "kamaitachi", group: "合成", name: "疾雷斬風虎", skill: "迅雷の筆さばき", bonusType: "stroke", bonusVal: 9, colors: ["#1e293b", "#06b6d4", "#fef08a"] },
-      { id: "f_06", shape: "spirit", p1: "yuki", p2: "nurari", group: "合成", name: "永劫雪華主", skill: "氷結の記憶力", bonusType: "read", bonusVal: 8, colors: ["#0369a1", "#6366f1", "#ffffff"] },
-      { id: "f_07", shape: "oni", p1: "oni", p2: "hi", group: "合成", name: "業火焔鬼神", skill: "紅蓮の闘志", bonusType: "idiom", bonusVal: 8, colors: ["#7f1d1d", "#f97316", "#fef08a"] },
-      { id: "f_08", shape: "spirit", p1: "hikari", p2: "kaze", group: "合成", name: "天球星風精", skill: "星風の導き", bonusType: "all", bonusVal: 8, colors: ["#3730a3", "#14b8a6", "#fde047"] },
-      { id: "f_09", shape: "turtle", p1: "genbu", p2: "tsuchi", group: "合成", name: "太古磐石神", skill: "大地の不動心", bonusType: "stroke", bonusVal: 8, colors: ["#1e3a8a", "#92400e", "#fef08a"] },
-      { id: "f_10", shape: "dragon", p1: "ryu", p2: "hikari", group: "合成", name: "星辰昇龍", skill: "銀河の閃光", bonusType: "all", bonusVal: 9, colors: ["#1e1b4b", "#38bdf8", "#facc15"] },
-      { id: "f_11", shape: "fox", p1: "kyubi", p2: "hikari", group: "合成", name: "月読九尾姫", skill: "月光の言霊", bonusType: "idiom", bonusVal: 9, colors: ["#4c1d95", "#f472b6", "#fef9c3"] },
-      { id: "f_12", shape: "spirit", p1: "kodama", p2: "tsuchi", group: "合成", name: "世界樹の守護者", skill: "樹海の叡智", bonusType: "read", bonusVal: 8, colors: ["#14532d", "#a16207", "#86efac"] },
-      { id: "f_13", shape: "bird", p1: "houou", p2: "hi", group: "合成", name: "太陽不死鳥", skill: "陽光の祝福", bonusType: "stroke", bonusVal: 9, colors: ["#991b1b", "#f59e0b", "#fef08a"] },
-      { id: "f_14", shape: "dragon", p1: "mizuchi", p2: "yuki", group: "合成", name: "蒼氷龍姫", skill: "深淵の静謐", bonusType: "read", bonusVal: 9, colors: ["#075985", "#38bdf8", "#e0f2fe"] },
-      { id: "f_15", shape: "bird", p1: "tengu", p2: "kaze", group: "合成", name: "天狗風神王", skill: "烈風の筆致", bonusType: "stroke", bonusVal: 8, colors: ["#7f1d1d", "#2dd4bf", "#fde047"] },
-      { id: "f_16", shape: "beast", p1: "kirin", p2: "byakko", group: "合成", name: "白金聖獣王", skill: "黄金の集中力", bonusType: "all", bonusVal: 9, colors: ["#78350f", "#e2e8f0", "#facc15"] },
-      { id: "f_17", shape: "oni", p1: "nurari", p2: "oni", group: "合成", name: "百鬼夜行魔王", skill: "覇王の熟語力", bonusType: "idiom", bonusVal: 10, colors: ["#312e81", "#dc2626", "#fde047"] },
-      { id: "f_18", shape: "dragon", p1: "f_01", p2: "f_02", group: "合成", name: "万象創造神獣", skill: "百八霊獣の極み", bonusType: "all", bonusVal: 12, colors: ["#1e1b4b", "#b91c1c", "#facc15"] }
+      { id: "f_01", p1: "ryu", p2: "houou", group: "合成", name: "天翔皇龍鳳", skill: "皇天の双翼", bonusType: "all", bonusVal: 8, colors: ["#b91c1c", "#1d4ed8", "#facc15"] },
+      { id: "f_02", p1: "kyubi", p2: "tengu", group: "合成", name: "魔界妖帝", skill: "妖術の極意", bonusType: "idiom", bonusVal: 9, colors: ["#581c87", "#e11d48", "#fde047"] },
+      { id: "f_03", p1: "kodama", p2: "mizuchi", group: "合成", name: "翠水聖霊王", skill: "聖域の加護", bonusType: "all", bonusVal: 8, colors: ["#047857", "#0284c7", "#fef08a"] },
+      { id: "f_04", p1: "kirin", p2: "hakutaku", group: "合成", name: "賢聖瑞獣", skill: "叡智の啓示", bonusType: "read", bonusVal: 9, colors: ["#a16207", "#059669", "#ffffff"] },
+      { id: "f_05", p1: "byakko", p2: "kamaitachi", group: "合成", name: "疾雷斬風虎", skill: "迅雷の筆さばき", bonusType: "stroke", bonusVal: 9, colors: ["#1e293b", "#06b6d4", "#fef08a"] },
+      { id: "f_06", p1: "yuki", p2: "nurari", group: "合成", name: "永劫雪華主", skill: "氷結の記憶力", bonusType: "read", bonusVal: 8, colors: ["#0369a1", "#6366f1", "#ffffff"] },
+      { id: "f_07", p1: "oni", p2: "hi", group: "合成", name: "業火焔鬼神", skill: "紅蓮の闘志", bonusType: "idiom", bonusVal: 8, colors: ["#7f1d1d", "#f97316", "#fef08a"] },
+      { id: "f_08", p1: "hikari", p2: "kaze", group: "合成", name: "天球星風精", skill: "星風の導き", bonusType: "all", bonusVal: 8, colors: ["#3730a3", "#14b8a6", "#fde047"] },
+      { id: "f_09", p1: "genbu", p2: "tsuchi", group: "合成", name: "太古磐石神", skill: "大地の不動心", bonusType: "stroke", bonusVal: 8, colors: ["#1e3a8a", "#92400e", "#fef08a"] },
+      { id: "f_10", p1: "ryu", p2: "hikari", group: "合成", name: "星辰昇龍", skill: "銀河の閃光", bonusType: "all", bonusVal: 9, colors: ["#1e1b4b", "#38bdf8", "#facc15"] },
+      { id: "f_11", p1: "kyubi", p2: "hikari", group: "合成", name: "月読九尾姫", skill: "月光の言霊", bonusType: "idiom", bonusVal: 9, colors: ["#4c1d95", "#f472b6", "#fef9c3"] },
+      { id: "f_12", p1: "kodama", p2: "tsuchi", group: "合成", name: "世界樹の守護者", skill: "樹海の叡智", bonusType: "read", bonusVal: 8, colors: ["#14532d", "#a16207", "#86efac"] },
+      { id: "f_13", p1: "houou", p2: "hi", group: "合成", name: "太陽不死鳥", skill: "陽光の祝福", bonusType: "stroke", bonusVal: 9, colors: ["#991b1b", "#f59e0b", "#fef08a"] },
+      { id: "f_14", p1: "mizuchi", p2: "yuki", group: "合成", name: "蒼氷龍姫", skill: "深淵の静謐", bonusType: "read", bonusVal: 9, colors: ["#075985", "#38bdf8", "#e0f2fe"] },
+      { id: "f_15", p1: "tengu", p2: "kaze", group: "合成", name: "天狗風神王", skill: "烈風の筆致", bonusType: "stroke", bonusVal: 8, colors: ["#7f1d1d", "#2dd4bf", "#fde047"] },
+      { id: "f_16", p1: "kirin", p2: "byakko", group: "合成", name: "白金聖獣王", skill: "黄金の集中力", bonusType: "all", bonusVal: 9, colors: ["#78350f", "#e2e8f0", "#facc15"] },
+      { id: "f_17", p1: "nurari", p2: "oni", group: "合成", name: "百鬼夜行魔王", skill: "覇王の熟語力", bonusType: "idiom", bonusVal: 10, colors: ["#312e81", "#dc2626", "#fde047"] },
+      { id: "f_18", p1: "f_01", p2: "f_02", group: "合成", name: "万象創造神獣", skill: "百八霊獣の極み", bonusType: "all", bonusVal: 12, colors: ["#1e1b4b", "#b91c1c", "#facc15"] }
     ];
 
     const SPECIES_108 = [];
@@ -921,7 +1448,6 @@
           id,
           no: SPECIES_108.length + 1,
           lineageId: line.id,
-          shape: line.shape,
           stage: s + 1,
           group: line.group,
           name,
@@ -945,7 +1471,6 @@
         id: rec.id,
         no: 91 + idx,
         lineageId: rec.id,
-        shape: rec.shape,
         stage: 5,
         group: "合成",
         name: rec.name,
@@ -958,20 +1483,7 @@
       });
     });
 
-    const LOCAL_IDIOMS = new Set([
-      "海原", "海外", "海岸", "海辺", "海底", "海面", "海水", "海風", "海洋", "海戦", "海賊", "日本海", "瀬戸内海", "深海", "南海", "北海", "東海", "臨海",
-      "建築", "建設", "建物", "建造", "再建", "新建", "建て前",
-      "発達", "到達", "伝達", "達人", "上達", "未達", "速達", "配達",
-      "愛情", "愛着", "愛読", "愛犬", "愛車", "愛国", "純愛", "慈愛", "恋愛", "友愛",
-      "機械", "機関", "機能", "危機", "機会", "飛行機", "電機", "動機", "有機", "無機",
-      "関係", "関心", "関連", "関所", "玄関", "無関心", "関門",
-      "選択", "選手", "当選", "選挙", "選出", "精選", "特選", "選抜", "厳選",
-      "特別", "特殊", "特急", "特技", "特徴", "特産", "特権", "特訓", "特売",
-      "漁業", "漁港", "漁師", "漁船", "漁場", "漁獲", "遠洋漁業", "定置漁業",
-      "生産", "産業", "水産", "畜産", "農産", "産物", "出産", "原産", "特産", "国産", "財産"
-    ]);
-
-    const STORAGE_KEY = "kanji_108_save_v4";
+    const STORAGE_KEY = "kanji_108_save_v5";
 
     function createInitialMonster(speciesId) {
       const sp = SPECIES_108.find(x => x.id === speciesId) || SPECIES_108[0];
@@ -988,8 +1500,6 @@
     let state = {
       coins: 120,
       combo: 0,
-      kanjiIndex: 0,
-      step: 1,
       verifyOpen: true,
       unlockedDex: ["ryu_s5", "kyubi_s5", "houou_s5", "oni_s5"],
       party: [
@@ -1023,7 +1533,8 @@
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
     }
 
-    function getSkillBonusCoins(baseCoins, category) {
+    window.onKanjiReward = (baseCoins, category) => {
+      state.combo += 1;
       let extra = 0;
       state.party.forEach(m => {
         const sp = SPECIES_108.find(x => x.id === m.speciesId);
@@ -1033,8 +1544,18 @@
           extra += Math.round(sp.bonusVal * mult);
         }
       });
-      return baseCoins + extra;
-    }
+      const total = baseCoins + extra;
+      state.coins += total;
+      updateHeader();
+      saveState();
+      return total;
+    };
+
+    window.onKanjiMiss = () => {
+      state.combo = 0;
+      updateHeader();
+      saveState();
+    };
 
     function updateHeader() {
       document.getElementById("coinCount").textContent = state.coins;
@@ -1049,24 +1570,6 @@
       btn.textContent = `🛠️ 検証バー：${state.verifyOpen ? "ON" : "OFF"}`;
       btn.classList.toggle("off", !state.verifyOpen);
       saveState();
-    }
-
-    function initVerifySelect() {
-      const sel = document.getElementById("verifyKanjiSelect");
-      sel.innerHTML = KANJI_DATA.map((k, idx) => `<option value="${idx}">${idx + 1}. ${k.char}（${k.onyomi}）</option>`).join("");
-      sel.value = String(state.kanjiIndex);
-    }
-
-    function selectVerifyKanji(val) {
-      state.kanjiIndex = Number(val) || 0;
-      const keepStep = state.step;
-      loadKanjiQuestion(keepStep);
-      saveState();
-    }
-
-    function jumpStep(stepNum) {
-      switchTab("learn");
-      setStep(stepNum);
     }
 
     function addTestCoins(amt) {
@@ -1094,9 +1597,7 @@
       document.querySelectorAll(".nav-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tabName));
       document.querySelectorAll(".tab-panel").forEach(p => p.style.display = "none");
       document.getElementById("tab-" + tabName).style.display = "block";
-      if (tabName === "learn" && state.step === 2) {
-        setTimeout(() => { setupStrokeCanvas(); renderStrokeState(); }, 40);
-      }
+      if (tabName === "learn") KanjiModule.onTabShown();
       if (tabName === "raise") renderRaiseTab();
       if (tabName === "fuse") renderFuseTab();
       if (tabName === "dex") renderDex("all");
@@ -1115,628 +1616,6 @@
       if (el) el.className = "feedback-banner";
     }
 
-    function loadKanjiQuestion(targetStep = 1) {
-      const k = KANJI_DATA[state.kanjiIndex];
-      document.getElementById("currentKanjiChar").textContent = k.char;
-      document.getElementById("currentKanjiReadings").textContent = `音読み：${k.onyomi} ／ 訓読み：${k.kunyomi || "なし"}`;
-      document.getElementById("idiomTargetChar").textContent = k.char;
-      document.getElementById("verifyKanjiSelect").value = String(state.kanjiIndex);
-      hideBanner("learnFeedback");
-
-      const grid = document.getElementById("choiceGrid");
-      grid.innerHTML = "";
-      k.choices.forEach((choice, idx) => {
-        const btn = document.createElement("button");
-        btn.className = "choice-btn";
-        btn.textContent = choice;
-        btn.onclick = () => checkReadingChoice(idx, btn);
-        grid.appendChild(btn);
-      });
-
-      resetStrokePractice();
-      initIdiomSlots();
-      setStep(targetStep);
-    }
-
-    function setStep(stepNum) {
-      state.step = stepNum;
-      [1, 2, 3].forEach(n => {
-        document.getElementById("stepPanel" + n).style.display = n === stepNum ? "block" : "none";
-        const ind = document.getElementById("stepInd" + n);
-        ind.classList.remove("active", "done");
-        if (n < stepNum) ind.classList.add("done");
-        else if (n === stepNum) ind.classList.add("active");
-        const vBtn = document.getElementById("vStep" + n);
-        if (vBtn) vBtn.classList.toggle("active", n === stepNum);
-      });
-      if (stepNum === 2) {
-        setTimeout(() => { setupStrokeCanvas(); renderStrokeState(); }, 40);
-      }
-      if (stepNum === 3) {
-        setTimeout(() => initIdiomCanvases(), 40);
-      }
-      saveState();
-    }
-
-    function checkReadingChoice(idx, btn) {
-      const k = KANJI_DATA[state.kanjiIndex];
-      const allBtns = document.querySelectorAll("#choiceGrid .choice-btn");
-      allBtns.forEach(b => b.disabled = true);
-
-      if (idx === k.answerIndex) {
-        btn.classList.add("correct");
-        state.combo += 1;
-        const earned = getSkillBonusCoins(15 + Math.min(state.combo * 2, 10), "read");
-        state.coins += earned;
-        updateHeader();
-        saveState();
-        showBanner("learnFeedback", `⭕ 正解！+${earned}コイン獲得！ステップ2（書き順）へ進むよ。`, true);
-        setTimeout(() => setStep(2), 850);
-      } else {
-        btn.classList.add("wrong");
-        allBtns[k.answerIndex].classList.add("correct");
-        state.combo = 0;
-        updateHeader();
-        saveState();
-        showBanner("learnFeedback", `❌ 残念！正解は「${k.choices[k.answerIndex]}」。ステップ2で書き順を練習しよう！`, false);
-        setTimeout(() => setStep(2), 1400);
-      }
-    }
-
-    function prevKanji() {
-      state.kanjiIndex = (state.kanjiIndex - 1 + KANJI_DATA.length) % KANJI_DATA.length;
-      loadKanjiQuestion(1);
-    }
-
-    function nextKanji() {
-      state.kanjiIndex = (state.kanjiIndex + 1) % KANJI_DATA.length;
-      loadKanjiQuestion(1);
-    }
-
-    function finishKanjiAndNext() {
-      nextKanji();
-    }
-
-    let strokeCanvas, strokeCtx, canvasLogicalSize = 320;
-    let currentStrokeIdx = 0;
-    let isDrawingStroke = false;
-    let userStrokePoints = [];
-    let isAnimatingDemo = false;
-
-    function getNormalizedStrokes(rawStrokes, size) {
-      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-      rawStrokes.forEach(st => st.forEach(([x, y]) => {
-        if (x < minX) minX = x;
-        if (y < minY) minY = y;
-        if (x > maxX) maxX = x;
-        if (y > maxY) maxY = y;
-      }));
-      const spanX = Math.max(1, maxX - minX);
-      const spanY = Math.max(1, maxY - minY);
-      const pad = size * 0.17;
-      const avail = size - pad * 2;
-      const scale = Math.min(avail / spanX, avail / spanY);
-      const offsetX = pad + (avail - spanX * scale) / 2;
-      const offsetY = pad + (avail - spanY * scale) / 2;
-
-      return rawStrokes.map(st => st.map(([x, y]) => [
-        offsetX + (x - minX) * scale,
-        offsetY + (y - minY) * scale
-      ]));
-    }
-
-    function setupStrokeCanvas() {
-      strokeCanvas = document.getElementById("strokeCanvas");
-      if (!strokeCanvas) return;
-      const rect = strokeCanvas.getBoundingClientRect();
-      canvasLogicalSize = Math.max(220, Math.round(rect.width || 300));
-      const dpr = window.devicePixelRatio || 1;
-      strokeCanvas.width = Math.round(canvasLogicalSize * dpr);
-      strokeCanvas.height = Math.round(canvasLogicalSize * dpr);
-      strokeCtx = strokeCanvas.getContext("2d");
-      strokeCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      strokeCanvas.onpointerdown = onStrokeDown;
-      strokeCanvas.onpointermove = onStrokeMove;
-      strokeCanvas.onpointerup = onStrokeUp;
-      strokeCanvas.onpointercancel = onStrokeUp;
-    }
-
-    function resetStrokePractice() {
-      currentStrokeIdx = 0;
-      userStrokePoints = [];
-      isAnimatingDemo = false;
-      setupStrokeCanvas();
-      renderStrokeState();
-    }
-
-    function drawGuideGrid(ctx, s) {
-      ctx.save();
-      ctx.strokeStyle = "#e5dec9";
-      ctx.lineWidth = 1.5;
-      ctx.setLineDash([6, 6]);
-      ctx.beginPath();
-      ctx.moveTo(s / 2, 8); ctx.lineTo(s / 2, s - 8);
-      ctx.moveTo(8, s / 2); ctx.lineTo(s - 8, s / 2);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    function renderStrokeState(overrideDemoStrokes = null) {
-      if (!strokeCtx) setupStrokeCanvas();
-      if (!strokeCtx) return;
-      const s = canvasLogicalSize;
-      const ctx = strokeCtx;
-      const k = KANJI_DATA[state.kanjiIndex];
-      const normStrokes = getNormalizedStrokes(k.strokes, s);
-
-      ctx.clearRect(0, 0, s, s);
-      drawGuideGrid(ctx, s);
-
-      ctx.save();
-      ctx.strokeStyle = "#e6e0d2";
-      ctx.lineWidth = 14;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      normStrokes.forEach(pts => {
-        ctx.beginPath();
-        pts.forEach(([x, y], i) => i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y));
-        ctx.stroke();
-      });
-      ctx.restore();
-
-      ctx.save();
-      ctx.strokeStyle = "#1f3a5f";
-      ctx.lineWidth = 12;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      for (let i = 0; i < currentStrokeIdx && i < normStrokes.length; i++) {
-        const pts = normStrokes[i];
-        ctx.beginPath();
-        pts.forEach(([x, y], idx) => idx === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y));
-        ctx.stroke();
-      }
-      ctx.restore();
-
-      if (overrideDemoStrokes) {
-        ctx.save();
-        ctx.strokeStyle = "#b83a2d";
-        ctx.lineWidth = 11;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        overrideDemoStrokes.forEach(pts => {
-          if (!pts || pts.length === 0) return;
-          ctx.beginPath();
-          pts.forEach(([x, y], idx) => idx === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y));
-          ctx.stroke();
-        });
-        ctx.restore();
-      } else if (currentStrokeIdx < normStrokes.length) {
-        const activePts = normStrokes[currentStrokeIdx];
-        const startPt = activePts[0];
-        const endPt = activePts[activePts.length - 1];
-
-        ctx.save();
-        ctx.fillStyle = "#2c6e49";
-        ctx.beginPath();
-        ctx.arc(startPt[0], startPt[1], 13, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 12px sans-serif";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(String(currentStrokeIdx + 1), startPt[0], startPt[1]);
-
-        ctx.fillStyle = "#b83a2d";
-        ctx.beginPath();
-        ctx.arc(endPt[0], endPt[1], 7, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-
-      if (userStrokePoints.length > 1) {
-        ctx.save();
-        ctx.strokeStyle = "#2c6e49";
-        ctx.lineWidth = 10;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.beginPath();
-        userStrokePoints.forEach(([x, y], idx) => idx === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y));
-        ctx.stroke();
-        ctx.restore();
-      }
-
-      const rem = Math.max(0, normStrokes.length - currentStrokeIdx);
-      document.getElementById("strokeGuideText").textContent =
-        rem > 0
-          ? `${currentStrokeIdx + 1}画目：緑の「${currentStrokeIdx + 1}」から赤い点へなぞろう（あと ${rem} 画）`
-          : `全${normStrokes.length}画 完成！`;
-    }
-
-    function getCanvasPos(e, canvas, logicalSize) {
-      const rect = canvas.getBoundingClientRect();
-      return {
-        x: ((e.clientX - rect.left) / rect.width) * logicalSize,
-        y: ((e.clientY - rect.top) / rect.height) * logicalSize
-      };
-    }
-
-    function onStrokeDown(e) {
-      if (isAnimatingDemo) return;
-      e.preventDefault();
-      strokeCanvas.setPointerCapture(e.pointerId);
-      isDrawingStroke = true;
-      userStrokePoints = [getCanvasPos(e, strokeCanvas, canvasLogicalSize)];
-      renderStrokeState();
-    }
-
-    function onStrokeMove(e) {
-      if (!isDrawingStroke || isAnimatingDemo) return;
-      e.preventDefault();
-      userStrokePoints.push(getCanvasPos(e, strokeCanvas, canvasLogicalSize));
-      renderStrokeState();
-    }
-
-    function onStrokeUp() {
-      if (!isDrawingStroke) return;
-      isDrawingStroke = false;
-      const k = KANJI_DATA[state.kanjiIndex];
-      const normStrokes = getNormalizedStrokes(k.strokes, canvasLogicalSize);
-      if (currentStrokeIdx >= normStrokes.length) return;
-
-      const targetPts = normStrokes[currentStrokeIdx];
-      const startTarget = targetPts[0];
-      const endTarget = targetPts[targetPts.length - 1];
-      const tol = canvasLogicalSize * 0.24;
-
-      if (userStrokePoints.length >= 2) {
-        const uStart = userStrokePoints[0];
-        const uEnd = userStrokePoints[userStrokePoints.length - 1];
-        const dStart = Math.hypot(uStart.x - startTarget[0], uStart.y - startTarget[1]);
-        const dEnd = Math.hypot(uEnd.x - endTarget[0], uEnd.y - endTarget[1]);
-        if (dStart <= tol && dEnd <= tol) {
-          currentStrokeIdx += 1;
-          userStrokePoints = [];
-          renderStrokeState();
-          if (currentStrokeIdx >= normStrokes.length) {
-            state.combo += 1;
-            const earned = getSkillBonusCoins(25, "stroke");
-            state.coins += earned;
-            updateHeader();
-            saveState();
-            showBanner("learnFeedback", `🎉 書き順クリア！+${earned}コイン獲得！ステップ3（熟語チャレンジ）へ進むよ。`, true);
-            setTimeout(() => setStep(3), 900);
-          }
-          return;
-        }
-      }
-      userStrokePoints = [];
-      renderStrokeState();
-      showBanner("learnFeedback", "💡 緑の数字から赤い点に向かって、もう少し近づけてなぞってみよう！", false);
-    }
-
-    function playDemoAnimation() {
-      if (isAnimatingDemo) return;
-      isAnimatingDemo = true;
-      const k = KANJI_DATA[state.kanjiIndex];
-      const normStrokes = getNormalizedStrokes(k.strokes, canvasLogicalSize);
-      let sIdx = 0;
-      let pIdx = 0;
-      const drawn = [];
-
-      function stepAnim() {
-        if (!isAnimatingDemo) return;
-        if (sIdx >= normStrokes.length) {
-          isAnimatingDemo = false;
-          setTimeout(() => renderStrokeState(), 500);
-          return;
-        }
-        const pts = normStrokes[sIdx];
-        if (!drawn[sIdx]) drawn[sIdx] = [];
-        drawn[sIdx].push(pts[pIdx]);
-        renderStrokeState(drawn);
-        pIdx += 1;
-        if (pIdx >= pts.length) {
-          sIdx += 1;
-          pIdx = 0;
-          setTimeout(stepAnim, 240);
-        } else {
-          setTimeout(stepAnim, 95);
-        }
-      }
-      stepAnim();
-    }
-
-    const idiomSlots = Array.from({ length: 5 }, () => ({
-      word: "",
-      candidates: [],
-      currentStrokes: [],
-      timer: null,
-      judgeText: "",
-      judgeClass: ""
-    }));
-
-    function initIdiomSlots() {
-      idiomSlots.forEach(sl => {
-        clearTimeout(sl.timer);
-        sl.word = "";
-        sl.candidates = [];
-        sl.currentStrokes = [];
-        sl.judgeText = "";
-        sl.judgeClass = "";
-      });
-      renderIdiomList();
-    }
-
-    function renderIdiomList() {
-      const listEl = document.getElementById("idiomList");
-      listEl.innerHTML = "";
-      idiomSlots.forEach((sl, idx) => {
-        const card = document.createElement("div");
-        card.className = "idiom-card";
-
-        const topRow = document.createElement("div");
-        topRow.className = "idiom-top-row";
-        const wordBox = document.createElement("div");
-        wordBox.className = "idiom-word-display";
-        wordBox.textContent = sl.word || "（1文字ずつ書いてね）";
-        topRow.appendChild(wordBox);
-
-        if (sl.judgeText) {
-          const badge = document.createElement("span");
-          badge.className = "judge-badge " + sl.judgeClass;
-          badge.textContent = sl.judgeText;
-          topRow.appendChild(badge);
-        }
-        card.appendChild(topRow);
-
-        const candRow = document.createElement("div");
-        candRow.className = "candidate-row";
-        if (sl.candidates.length > 0 && sl.word.length > 0) {
-          const lbl = document.createElement("span");
-          lbl.style.fontSize = "0.75rem";
-          lbl.style.color = "var(--ink-sub)";
-          lbl.textContent = "最後の1字を変更：";
-          candRow.appendChild(lbl);
-          sl.candidates.slice(0, 5).forEach(ch => {
-            const cBtn = document.createElement("button");
-            cBtn.className = "cand-btn";
-            cBtn.textContent = ch;
-            cBtn.onclick = () => {
-              sl.word = sl.word.slice(0, -1) + ch;
-              renderIdiomList();
-              initIdiomCanvases();
-            };
-            candRow.appendChild(cBtn);
-          });
-        }
-        card.appendChild(candRow);
-
-        const cvs = document.createElement("canvas");
-        cvs.className = "idiom-mini-canvas";
-        cvs.dataset.slot = String(idx);
-        card.appendChild(cvs);
-
-        const btnRow = document.createElement("div");
-        btnRow.style.display = "flex";
-        btnRow.style.gap = "6px";
-        btnRow.style.flexWrap = "wrap";
-
-        const bClearCur = document.createElement("button");
-        bClearCur.className = "btn btn-secondary btn-sm";
-        bClearCur.textContent = "いまの字を消す";
-        bClearCur.onclick = () => {
-          clearTimeout(sl.timer);
-          sl.currentStrokes = [];
-          redrawIdiomCanvas(idx);
-        };
-
-        const bBack = document.createElement("button");
-        bBack.className = "btn btn-secondary btn-sm";
-        bBack.textContent = "1字もどす";
-        bBack.onclick = () => {
-          sl.word = sl.word.slice(0, -1);
-          sl.judgeText = "";
-          renderIdiomList();
-          initIdiomCanvases();
-        };
-
-        const bAll = document.createElement("button");
-        bAll.className = "btn btn-secondary btn-sm";
-        bAll.textContent = "全部消す";
-        bAll.onclick = () => {
-          clearTimeout(sl.timer);
-          sl.word = "";
-          sl.candidates = [];
-          sl.currentStrokes = [];
-          sl.judgeText = "";
-          renderIdiomList();
-          initIdiomCanvases();
-        };
-
-        btnRow.append(bClearCur, bBack, bAll);
-        card.appendChild(btnRow);
-        listEl.appendChild(card);
-      });
-      initIdiomCanvases();
-    }
-
-    function initIdiomCanvases() {
-      document.querySelectorAll(".idiom-mini-canvas").forEach(cvs => {
-        const idx = Number(cvs.dataset.slot);
-        const rect = cvs.getBoundingClientRect();
-        const w = Math.max(180, Math.round(rect.width || 240));
-        const h = Math.max(96, Math.round(rect.height || 118));
-        cvs.width = w;
-        cvs.height = h;
-        redrawIdiomCanvas(idx);
-
-        let drawing = false;
-        cvs.onpointerdown = e => {
-          e.preventDefault();
-          cvs.setPointerCapture(e.pointerId);
-          drawing = true;
-          clearTimeout(idiomSlots[idx].timer);
-          idiomSlots[idx].currentStrokes.push([{ x: e.offsetX, y: e.offsetY }]);
-          redrawIdiomCanvas(idx);
-        };
-        cvs.onpointermove = e => {
-          if (!drawing) return;
-          e.preventDefault();
-          const cur = idiomSlots[idx].currentStrokes;
-          cur[cur.length - 1].push({ x: e.offsetX, y: e.offsetY });
-          redrawIdiomCanvas(idx);
-        };
-        cvs.onpointerup = () => {
-          if (!drawing) return;
-          drawing = false;
-          scheduleCharRecognize(idx);
-        };
-      });
-    }
-
-    function redrawIdiomCanvas(idx) {
-      const cvs = document.querySelector(`.idiom-mini-canvas[data-slot="${idx}"]`);
-      if (!cvs) return;
-      const ctx = cvs.getContext("2d");
-      ctx.clearRect(0, 0, cvs.width, cvs.height);
-      ctx.save();
-      ctx.strokeStyle = "#1d2633";
-      ctx.lineWidth = 6;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      idiomSlots[idx].currentStrokes.forEach(st => {
-        if (st.length < 2) return;
-        ctx.beginPath();
-        st.forEach((pt, i) => i === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y));
-        ctx.stroke();
-      });
-      ctx.restore();
-    }
-
-    function scheduleCharRecognize(idx) {
-      const sl = idiomSlots[idx];
-      clearTimeout(sl.timer);
-      sl.timer = setTimeout(() => recognizeSingleChar(idx), 650);
-    }
-
-    async function recognizeSingleChar(idx) {
-      const sl = idiomSlots[idx];
-      if (!sl.currentStrokes.length) return;
-      const cvs = document.querySelector(`.idiom-mini-canvas[data-slot="${idx}"]`);
-      const w = cvs ? cvs.width : 240;
-      const h = cvs ? cvs.height : 118;
-
-      const ink = sl.currentStrokes.map(st => [
-        st.map(p => Math.round(p.x)),
-        st.map(p => Math.round(p.y)),
-        st.map((_, i) => i * 25)
-      ]);
-
-      let cands = [];
-      try {
-        const res = await fetch("https://inputtools.google.com/request?itc=ja-t-i0-handwrit&app=test", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            options: "enable_pre_space",
-            requests: [{ writing_guide: { writing_area_width: w, writing_area_height: h }, ink, max_completions: 6, max_num_results: 6 }]
-          })
-        });
-        const data = await res.json();
-        if (data && data[0] === "SUCCESS" && data[1]?.[0]?.[1]) {
-          cands = data[1][0][1].map(s => s[0]).filter(Boolean);
-        }
-      } catch (e) {}
-
-      if (!cands.length) {
-        cands = [KANJI_DATA[state.kanjiIndex].char, "日", "本", "山", "川"];
-      }
-
-      sl.candidates = cands;
-      sl.word += cands[0];
-      sl.currentStrokes = [];
-      renderIdiomList();
-    }
-
-    async function isRealJapaneseWord(word) {
-      if (LOCAL_IDIOMS.has(word)) return true;
-      try {
-        const res = await fetch("https://jisho.org/api/v1/search/words?keyword=" + encodeURIComponent(word));
-        const data = await res.json();
-        if (Array.isArray(data.data)) {
-          return data.data.some(item =>
-            Array.isArray(item.japanese) && item.japanese.some(j => j.word === word || j.reading === word)
-          );
-        }
-      } catch (e) {
-        return false;
-      }
-      return false;
-    }
-
-    async function gradeAllIdioms() {
-      const targetChar = KANJI_DATA[state.kanjiIndex].char;
-      const seen = new Set();
-      let correctCount = 0;
-
-      for (let i = 0; i < idiomSlots.length; i++) {
-        const sl = idiomSlots[i];
-        const w = sl.word.trim();
-        if (!w) {
-          sl.judgeText = "";
-          sl.judgeClass = "";
-          continue;
-        }
-        if (w.length < 2) {
-          sl.judgeText = "❌ 2文字以上";
-          sl.judgeClass = "judge-ng";
-          continue;
-        }
-        if (!w.includes(targetChar)) {
-          sl.judgeText = `❌ 「${targetChar}」なし`;
-          sl.judgeClass = "judge-ng";
-          continue;
-        }
-        if (seen.has(w)) {
-          sl.judgeText = "⚠️ 重複";
-          sl.judgeClass = "judge-warn";
-          continue;
-        }
-        seen.add(w);
-
-        sl.judgeText = "確認中...";
-        sl.judgeClass = "judge-warn";
-        renderIdiomList();
-
-        const valid = await isRealJapaneseWord(w);
-        if (valid) {
-          sl.judgeText = "⭕ 正解！";
-          sl.judgeClass = "judge-ok";
-          correctCount += 1;
-        } else {
-          sl.judgeText = "❌ 未登録語";
-          sl.judgeClass = "judge-ng";
-        }
-      }
-
-      renderIdiomList();
-      if (correctCount > 0) {
-        const bonus5 = correctCount === 5 ? 35 : 0;
-        const earned = getSkillBonusCoins(correctCount * 15 + bonus5, "idiom");
-        state.coins += earned;
-        state.combo += correctCount;
-        updateHeader();
-        saveState();
-        showBanner("learnFeedback", `🏆 ${correctCount}個の熟語が正解！+${earned}コイン獲得（5個達成ボーナス：+${bonus5}）！`, true);
-      } else {
-        showBanner("learnFeedback", `「${targetChar}」を含む実在の熟語（2文字以上）を書いてもう一度自動採点してみよう！`, false);
-      }
-    }
-
-    // =========================================================================
-    // 画像ファイル読み込み＋フォールバックSVG描画
-    // =========================================================================
     function handleMonsterImgError(imgEl, lineageId, step) {
       if (step === 1) {
         imgEl.onerror = () => handleMonsterImgError(imgEl, lineageId, 2);
@@ -1825,13 +1704,7 @@
         sp.stage < 5 ? `進化条件：Lv.${reqLv}以上（現在Lv.${m.lv}）` : "最高段階（究極体）に到達！";
       document.getElementById("btnEvolve").disabled = !canEvo;
 
-      const statDefs = [
-        ["str", "ちから"],
-        ["def", "まもり"],
-        ["spd", "すばやさ"],
-        ["mag", "まりょく"],
-        ["wis", "かしこさ"]
-      ];
+      const statDefs = [["str", "ちから"], ["def", "まもり"], ["spd", "すばやさ"], ["mag", "まりょく"], ["wis", "かしこさ"]];
       const statsEl = document.getElementById("statsContainer");
       statsEl.innerHTML = "";
       statDefs.forEach(([key, label]) => {
@@ -1868,10 +1741,7 @@
       const m = state.party[state.selectedPartyIdx];
       state.coins -= cost;
       m.exp += 35;
-      while (m.exp >= 100) {
-        m.exp -= 100;
-        m.lv += 1;
-      }
+      while (m.exp >= 100) { m.exp -= 100; m.lv += 1; }
       updateHeader();
       saveState();
       renderRaiseTab();
@@ -2050,19 +1920,12 @@
     }
 
     loadState();
-    initVerifySelect();
     updateHeader();
     document.getElementById("verifyBar").style.display = state.verifyOpen ? "flex" : "none";
     const vBtn = document.getElementById("btnToggleVerify");
     vBtn.textContent = `🛠️ 検証バー：${state.verifyOpen ? "ON" : "OFF"}`;
     vBtn.classList.toggle("off", !state.verifyOpen);
-    loadKanjiQuestion(state.step || 1);
-    window.addEventListener("resize", () => {
-      if (document.getElementById("tab-learn").style.display !== "none" && state.step === 2) {
-        setupStrokeCanvas();
-        renderStrokeState();
-      }
-    });
+    KanjiModule.init();
   </script>
 </body>
 </html>
