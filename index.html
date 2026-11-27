@@ -26,7 +26,13 @@
       --font-ui: "Hiragino Maru Gothic ProN", "BIZ UDPGothic", "Meiryo", sans-serif;
     }
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
 
     body {
       margin: 0;
@@ -1312,9 +1318,25 @@
       let canvasSize = 320;
       let currentStrokeIdx = 0;
       let isDrawing = false;
+      let activePointerId = null;
+      let penDetected = false;
       let userPoints = [];
       let completedUserStrokes = [];
       let isDemoPlaying = false;
+
+      function isPalmOrIgnoredTouch(e) {
+        if (e.pointerType === "pen") {
+          penDetected = true;
+          return false;
+        }
+        if (e.pointerType === "touch") {
+          if (penDetected) return true;
+          // 接触面積（width * height）が大きい手のひら・手首の接触を除外
+          const area = (e.width || 0) * (e.height || 0);
+          if (area > 1600) return true;
+        }
+        return false;
+      }
 
       const idiomSlots = Array.from({ length: 5 }, () => ({
         targetWord: "",
@@ -1712,7 +1734,10 @@
       function onPointerDown(e) {
         if (isDemoPlaying) return;
         e.preventDefault();
-        strokeCanvas.setPointerCapture(e.pointerId);
+        if (isPalmOrIgnoredTouch(e)) return;
+        if (isDrawing && activePointerId !== null && activePointerId !== e.pointerId) return;
+        activePointerId = e.pointerId;
+        try { strokeCanvas.setPointerCapture(e.pointerId); } catch (err) {}
         isDrawing = true;
         userPoints = [getPos(e)];
         renderCanvas();
@@ -1720,14 +1745,18 @@
 
       function onPointerMove(e) {
         if (!isDrawing || isDemoPlaying) return;
+        if (activePointerId !== null && e.pointerId !== activePointerId) return;
+        if (isPalmOrIgnoredTouch(e)) return;
         e.preventDefault();
         userPoints.push(getPos(e));
         renderCanvas();
       }
 
-      function onPointerUp() {
+      function onPointerUp(e) {
         if (!isDrawing) return;
+        if (e && activePointerId !== null && e.pointerId !== activePointerId) return;
         isDrawing = false;
+        activePointerId = null;
         const k = KANJI_LIST[progress.currentIndex];
         const fitted = getFittedStrokes(k.char, canvasSize);
         if (!fitted || currentStrokeIdx >= fitted.length) return;
@@ -1993,10 +2022,14 @@
           redrawIdiomCanvas(idx);
 
           let drawing = false;
+          let slotPointerId = null;
           cvs.onpointerdown = e => {
             e.preventDefault();
-            cvs.setPointerCapture(e.pointerId);
+            if (isPalmOrIgnoredTouch(e)) return;
+            if (drawing && slotPointerId !== null && slotPointerId !== e.pointerId) return;
+            slotPointerId = e.pointerId;
             drawing = true;
+            try { cvs.setPointerCapture(e.pointerId); } catch (err) {}
             clearTimeout(idiomSlots[idx].timer);
             clearInterval(idiomSlots[idx].waitInterval);
             idiomSlots[idx].waitPct = 0;
@@ -2007,14 +2040,18 @@
           };
           cvs.onpointermove = e => {
             if (!drawing) return;
+            if (slotPointerId !== null && e.pointerId !== slotPointerId) return;
+            if (isPalmOrIgnoredTouch(e)) return;
             e.preventDefault();
             const cur = idiomSlots[idx].currentStrokes;
             cur[cur.length - 1].push({ x: e.offsetX, y: e.offsetY });
             redrawIdiomCanvas(idx);
           };
-          cvs.onpointerup = () => {
+          cvs.onpointerup = e => {
             if (!drawing) return;
+            if (e && slotPointerId !== null && e.pointerId !== slotPointerId) return;
             drawing = false;
+            slotPointerId = null;
             clearTimeout(idiomSlots[idx].timer);
             clearInterval(idiomSlots[idx].waitInterval);
             const startTime = Date.now();
@@ -2910,6 +2947,11 @@
       renderRewardTab();
     }
 
+    document.addEventListener("contextmenu", e => {
+      if (e.target.closest("canvas") || e.target.closest(".stroke-layout") || e.target.closest(".idiom-list")) {
+        e.preventDefault();
+      }
+    });
     loadState();
     updateHeader();
     document.getElementById("verifyBar").style.display = state.verifyOpen ? "flex" : "none";
