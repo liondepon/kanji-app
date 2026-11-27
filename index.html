@@ -1623,37 +1623,99 @@
         ctx.restore();
       }
 
-      // お手本アニメーション用：下の教科書体フォントそのものを1画ずつ書き順に沿って色付けする
+      // 点pから線分(a, b)への最短距離を計算するヘルパー（全202漢字共通の厳密クリッピング用）
+      function distToSegment(p, a, b) {
+        const vx = b.x - a.x;
+        const vy = b.y - a.y;
+        const wx = p.x - a.x;
+        const wy = p.y - a.y;
+        const lenSq = vx * vx + vy * vy;
+        if (lenSq <= 0.0001) return Math.hypot(p.x - a.x, p.y - a.y);
+        let t = (wx * vx + wy * vy) / lenSq;
+        if (t < 0) t = 0;
+        else if (t > 1) t = 1;
+        const projX = a.x + t * vx;
+        const projY = a.y + t * vy;
+        return Math.hypot(p.x - projX, p.y - projY);
+      }
+
+      // お手本アニメーション用：全漢字で関係ない画や文字外へはみ出さないよう、
+      // 現在のストローク線分付近かつ教科書体インク領域内のみを1画ずつ色付けする
       function drawColoredKyokashoDemo(ctx, s, char, demoStrokes) {
         if (!demoStrokes || demoStrokes.length === 0) return;
+        const field = buildKyokashoPixelField(char, s);
+        const bounds = field.bounds;
+
+        // 許容距離：ストローク線分からの最大距離（密集漢字で隣の画へ飛び火しないよう控えめに設定）
+        const maxSegDist = Math.max(11, s * 0.044);
+
+        // 探索範囲を教科書体バウンディングボックス周辺に限定して高速化
+        const minX = Math.max(0, Math.floor(bounds.minX - maxSegDist - 4));
+        const minY = Math.max(0, Math.floor(bounds.minY - maxSegDist - 4));
+        const maxX = Math.min(s - 1, Math.ceil(bounds.minX + bounds.width + maxSegDist + 4));
+        const maxY = Math.min(s - 1, Math.ceil(bounds.minY + bounds.height + maxSegDist + 4));
+
+        // 描画中の画（demoStrokes）に含まれる線分リストを抽出
+        const activeSegments = [];
+        demoStrokes.forEach(pts => {
+          if (!pts || pts.length === 0) return;
+          if (pts.length === 1) {
+            activeSegments.push([pts[0], { x: pts[0].x + 0.5, y: pts[0].y + 0.5 }]);
+          } else {
+            for (let i = 0; i < pts.length - 1; i++) {
+              activeSegments.push([pts[i], pts[i + 1]]);
+            }
+          }
+        });
+        if (activeSegments.length === 0) return;
+
         const off = document.createElement("canvas");
         off.width = s;
         off.height = s;
         const octx = off.getContext("2d");
+        const imgData = octx.createImageData(s, s);
+        const out = imgData.data;
 
-        // 1. 色付けしたい範囲（書き順に沿って太めにマスクを描く）
-        octx.save();
-        octx.strokeStyle = "#000000";
-        octx.lineWidth = Math.max(28, s * 0.115);
-        octx.lineCap = "round";
-        octx.lineJoin = "round";
-        demoStrokes.forEach(pts => {
-          if (!pts || pts.length === 0) return;
-          octx.beginPath();
-          pts.forEach((p, idx) => idx === 0 ? octx.moveTo(p.x, p.y) : octx.lineTo(p.x, p.y));
-          if (pts.length === 1) octx.lineTo(pts[0].x + 0.1, pts[0].y + 0.1);
-          octx.stroke();
-        });
-        octx.restore();
+        // 教科書体フォントのアルファ値（インク濃さ）と線分距離の両方を満たすピクセルのみ着色
+        // 色：朱色（#b83a2d -> 184, 58, 45）
+        for (let y = minY; y <= maxY; y++) {
+          const rowOff = y * s;
+          for (let x = minX; x <= maxX; x++) {
+            const kAlpha = field.alpha[rowOff + x];
+            if (kAlpha < 0.12) continue; // 教科書体インクがない空白領域は除外
 
-        // 2. source-in で教科書体フォントそのものを描画し、とめ・はね・はらいの形そのままに色付け
-        octx.globalCompositeOperation = "source-in";
-        octx.fillStyle = "#b83a2d";
-        octx.font = `600 ${Math.round(s * 0.78)}px "UD Digi Kyokasho N-R", "UD デジタル 教科書体 N-R", "YuKyokasho", "游教科書体", "Klee One", serif`;
-        octx.textAlign = "center";
-        octx.textBaseline = "middle";
-        octx.fillText(char, s / 2, s / 2 + s * 0.03);
+            const pt = { x, y };
+            let minD = Infinity;
+            for (let j = 0; j < activeSegments.length; j++) {
+              const seg = activeSegments[j];
+              // バウンディングボックスによる高速枝刈り
+              const segMinX = Math.min(seg[0].x, seg[1].x) - maxSegDist;
+              const segMaxX = Math.max(seg[0].x, seg[1].x) + maxSegDist;
+              if (x < segMinX || x > segMaxX) continue;
+              const segMinY = Math.min(seg[0].y, seg[1].y) - maxSegDist;
+              const segMaxY = Math.max(seg[0].y, seg[1].y) + maxSegDist;
+              if (y < segMinY || y > segMaxY) continue;
 
+              const d = distToSegment(pt, seg[0], seg[1]);
+              if (d < minD) minD = d;
+            }
+
+            if (minD <= maxSegDist) {
+              // 中心線に近いほど濃く、境界付近は滑らかにフェード
+              const edgeFactor = minD <= maxSegDist * 0.65
+                ? 1.0
+                : Math.max(0, 1 - (minD - maxSegDist * 0.65) / (maxSegDist * 0.35));
+              const finalAlpha = Math.min(255, Math.round(kAlpha * edgeFactor * 245));
+              const pIdx = (rowOff + x) * 4;
+              out[pIdx] = 184;
+              out[pIdx + 1] = 58;
+              out[pIdx + 2] = 45;
+              out[pIdx + 3] = finalAlpha;
+            }
+          }
+        }
+
+        octx.putImageData(imgData, 0, 0);
         ctx.drawImage(off, 0, 0);
       }
 
