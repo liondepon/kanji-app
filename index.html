@@ -1295,9 +1295,19 @@
           if (raw) {
             const p = JSON.parse(raw);
             progress = { ...progress, ...p };
-            if (!progress.reviewOffsetByChar) progress.reviewOffsetByChar = {};
+            if (!progress.reviewOffsetByChar || typeof progress.reviewOffsetByChar !== "object") {
+              progress.reviewOffsetByChar = {};
+            }
+            if (!Array.isArray(progress.todayCompletedChars)) progress.todayCompletedChars = [];
+            if (!Array.isArray(progress.masteredChars)) progress.masteredChars = [];
           }
         } catch (e) {}
+        const idxNum = Number(progress.currentIndex);
+        if (!Number.isInteger(idxNum) || idxNum < 0 || idxNum >= KANJI_LIST.length) {
+          progress.currentIndex = 0;
+        } else {
+          progress.currentIndex = idxNum;
+        }
         const today = getTodayKey();
         if (progress.date !== today) {
           progress.date = today;
@@ -2952,13 +2962,23 @@
         e.preventDefault();
       }
     });
-    loadState();
-    updateHeader();
-    document.getElementById("verifyBar").style.display = state.verifyOpen ? "flex" : "none";
-    const vBtn = document.getElementById("btnToggleVerify");
-    vBtn.textContent = `🛠️ 検証バー：${state.verifyOpen ? "ON" : "OFF"}`;
-    vBtn.classList.toggle("off", !state.verifyOpen);
-    KanjiModule.init();
+    function bootApp() {
+      loadState();
+      updateHeader();
+      const vBar = document.getElementById("verifyBar");
+      if (vBar) vBar.style.display = state.verifyOpen ? "flex" : "none";
+      const vBtn = document.getElementById("btnToggleVerify");
+      if (vBtn) {
+        vBtn.textContent = `🛠️ 検証バー：${state.verifyOpen ? "ON" : "OFF"}`;
+        vBtn.classList.toggle("off", !state.verifyOpen);
+      }
+      KanjiModule.init();
+    }
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", bootApp);
+    } else {
+      bootApp();
+    }
   </script>
 </body>
 </html>
