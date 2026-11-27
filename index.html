@@ -929,6 +929,26 @@
         "城":["ジョウ","しろ"],"群":["グン","むれる・むれ"]
       };
 
+      const KANJI_LIST = ORDERED_CHARS.map((ch, idx) => {
+        const [on, kun] = READING_DICT[ch] || ["オン", "くん"];
+        const correctLabel = `${on} ／ ${kun || "（訓読みなし）"}`;
+        const distractors = [];
+        for (let step = 1; distractors.length < 3; step++) {
+          const otherCh = ORDERED_CHARS[(idx + step * 17) % ORDERED_CHARS.length];
+          const [oOn, oKun] = READING_DICT[otherCh] || ["コウ", "かわ"];
+          const cand = `${oOn} ／ ${oKun || "（訓読みなし）"}`;
+          if (cand !== correctLabel && !distractors.includes(cand)) {
+            distractors.push(cand);
+          }
+        }
+        const choices = [correctLabel, ...distractors];
+        const answerIndex = idx % 4;
+        if (answerIndex !== 0) {
+          [choices[0], choices[answerIndex]] = [choices[answerIndex], choices[0]];
+        }
+        return { char: ch, onyomi: on, kunyomi: kun, choices, answerIndex };
+      });
+
       // 小4までに習う漢字の熟語リスト（よみがな付き・各漢字30候補確保用ベース）
       const IDIOM_BANK = [
         ["好意","こうい"],["友好","ゆうこう"],["愛好","あいこう"],["好物","こうぶつ"],["好調","こうちょう"],["好天","こうてん"],["好み","このみ"],["好き","すき"],["大好き","だいすき"],["好評","こうひょう"],
