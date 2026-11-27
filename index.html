@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>漢字道場＆百八霊獣伝（小学4年生・東京書籍全202字＆1日6漢字）</title>
+  <title>めざせ漢字王！小学生の霊獣クエスト（東京書籍全202字＆1日6漢字）</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&display=swap" rel="stylesheet" />
@@ -522,11 +522,11 @@
   <header>
     <div>
       <div class="brand-title">
-        <span>漢字道場＆百八霊獣伝</span>
+        <span>めざせ漢字王！小学生の霊獣クエスト</span>
         <span class="brand-badge">東京書籍・全202字</span>
         <span class="brand-badge">1日6漢字</span>
       </div>
-      <div class="brand-sub">教科書体基準（とめ・はね・はらい完全吸着） ／ 五能力＆スキル強化・合成・ごほうび交換</div>
+      <div class="brand-sub">教科書体基準（とめ・はね・はらい対応） ／ 五能力＆スキル強化・合成・ごほうび交換</div>
     </div>
     <div class="header-stats">
       <div class="stat-pill">📅 本日 <span id="dailyProgressHeader">0</span>/6字</div>
@@ -630,8 +630,8 @@
                   <button class="btn btn-secondary btn-sm" onclick="KanjiModule.resetStroke()">↺ 最初からやり直す</button>
                 </div>
                 <p style="font-size:0.84rem;color:var(--ink-sub);line-height:1.6;margin:0;">
-                  ・とめ・はね・はらいが明確な教科書体フォントを基準に、緑の数字から赤い点へ向かって1画ずつなぞろう。<br />
-                  ・各画の書き順ラインも教科書体の中心線に自動吸着して表示されるよ！
+                  ・うすい教科書体フォントを基準に、緑の数字から赤い点へ向かって1画ずつなぞろう。<br />
+                  ・タッチペンや指で書いた自分の字（筆跡）がそのまま残るので、とめ・はね・はらいが上手に書けたか確認できるよ！
                 </p>
               </div>
             </div>
@@ -777,13 +777,12 @@
 
   <script>
     // =========================================================================
-    // 独立した漢字学習モジュール（東京書籍・正味202字 ／ 1日6漢字 ／ 教科書体ピクセル吸着）
+    // 独立した漢字学習モジュール（東京書籍・正味202字 ／ 1日6漢字 ／ 子どもの実筆跡保持）
     // =========================================================================
     const KanjiModule = (() => {
       const DAILY_LIMIT = 6;
-      const KANJI_PROGRESS_KEY = "kanji_tokyoshoseki_202_v2";
+      const KANJI_PROGRESS_KEY = "kanji_tokyoshoseki_202_v3";
 
-      // 東京書籍 小学4年生 単元・配当順
       const TOKYO_SHOSEKI_ORDER = [
         "好","芽","巣","材","笑","泣","信","以","伝","念","折","試","験","連","続",
         "初","変","管","底","愛","害","周","囲","民","司","令","和","府","県","庁",
@@ -804,22 +803,6 @@
         "特","別","単","純","優","秀","極","最","末","完"
       ];
 
-      // 文部科学省 学習指導要領 第4学年配当漢字 正味202字（漏れなし完全版）
-      const GRADE_4_EXACT_202 = [
-        "愛","案","以","衣","位","囲","胃","印","英","栄","塩","億","加","果","貨","課","芽","改","械","害",
-        "街","各","覚","完","官","管","関","観","願","希","季","紀","喜","旗","器","機","議","求","泣","救",
-        "給","挙","漁","共","協","鏡","競","極","訓","軍","郡","径","型","景","芸","欠","結","建","健","験",
-        "固","功","好","候","航","康","告","差","菜","最","材","昨","札","刷","殺","察","参","産","散","残",
-        "士","氏","史","司","試","児","治","辞","失","借","種","周","祝","順","初","松","笑","唱","焼","象",
-        "照","賞","臣","信","成","省","清","静","席","積","折","節","説","浅","戦","選","然","争","倉","巣",
-        "束","側","続","卒","孫","帯","隊","達","単","置","仲","貯","兆","腸","低","底","停","的","典","伝",
-        "徒","努","灯","堂","働","特","得","毒","熱","念","敗","梅","博","飯","飛","費","必","票","標","不",
-        "夫","付","府","副","粉","兵","別","辺","変","便","包","法","望","牧","末","満","未","脈","民","無",
-        "約","勇","要","養","浴","利","陸","良","料","量","輪","類","令","冷","例","歴","連","老","労","録",
-        "茨","媛","岡","潟","岐","熊","香","佐","埼","崎","滋","鹿","縄","井","沖","栃","奈","梨","阪","阜",
-        "兵庫"
-      ];
-      // 上記の都道府県漢字を含め、第4学年配当の正味202字を厳密抽出
       const OFFICIAL_4TH_202 = Array.from(new Set([
         "愛","案","以","衣","位","囲","胃","印","英","栄","塩","億","加","果","貨","課","芽","改","械","害",
         "街","各","覚","完","官","管","関","観","願","希","季","紀","喜","旗","器","機","議","求","泣","救",
@@ -979,6 +962,8 @@
       let currentStrokeIdx = 0;
       let isDrawing = false;
       let userPoints = [];
+      // 子どもがタッチペン（指）で実際に書いた筆跡を画ごとにそのまま保持する配列
+      let completedUserStrokes = [];
       let isDemoPlaying = false;
 
       const idiomSlots = Array.from({ length: 5 }, () => ({
@@ -990,10 +975,7 @@
         judgeClass: ""
       }));
 
-      // =========================================================================
-      // 教科書体フォントのピクセル密度マップを構築し、各画・各点を教科書体の
-      // 実際のインク中心線へ直接吸着させる（全202字対応・偏と旁のズレ完全解消）
-      // =========================================================================
+      // 教科書体フォントのピクセル密度マップを構築し、書き順座標を教科書体インク中心線へ吸着
       function buildKyokashoPixelField(char, size) {
         const off = document.createElement("canvas");
         off.width = size;
@@ -1105,7 +1087,6 @@
         }
       }
 
-      // 全漢字対応：教科書体フォントのインク中心線へ1画ずつ反復吸着・平滑化する
       function getFittedStrokes(char, size) {
         const cacheKey = `${char}_${size}`;
         if (fittedCache[cacheKey]) return fittedCache[cacheKey];
@@ -1121,7 +1102,6 @@
         const w = Math.max(10, box.width - inset * 2);
         const h = Math.max(10, box.height - inset * 2);
 
-        // 初期配置（教科書体バウンディングボックス基準）
         let strokes = normStrokes.map(pts =>
           pts.map(p => ({
             x: left + p.nx * w,
@@ -1131,7 +1111,6 @@
 
         const inkPts = field.inkPoints;
         if (inkPts.length > 0) {
-          // 1. まず各画（ストローク単位）の平行移動ズレを教科書体インクへ吸着
           const strokeSearchR = size * 0.065;
           strokes = strokes.map(pts => {
             let bestDx = 0, bestDy = 0, bestScore = -1;
@@ -1146,7 +1125,6 @@
                     score += field.alpha[sy * size + sx];
                   }
                 }
-                // 元の位置からの移動ペナルティをわずかに加えて飛び移りを防止
                 score -= (Math.hypot(dx, dy) / strokeSearchR) * 0.35;
                 if (score > bestScore) {
                   bestScore = score;
@@ -1158,7 +1136,6 @@
             return pts.map(p => ({ x: p.x + bestDx, y: p.y + bestDy }));
           });
 
-          // 2. 次に各点を近傍の教科書体インク重心へ反復引き寄せ＋曲線平滑化
           const pointR = size * 0.042;
           for (let iter = 0; iter < 4; iter++) {
             strokes = strokes.map(pts => {
@@ -1185,7 +1162,6 @@
                 return { x: p.x, y: p.y };
               });
 
-              // 端点を保ちつつ中間点を滑らかに整形
               return pulled.map((p, idx) => {
                 if (idx === 0 || idx === pulled.length - 1) return p;
                 const prev = pulled[idx - 1];
@@ -1255,27 +1231,42 @@
         drawKyokashoBase(ctx, s, k.char);
 
         const fitted = getFittedStrokes(k.char, s);
+        const lineW = Math.max(6.5, s * 0.022);
+
+        // 1. 子どもがタッチペン（指）で実際に書いた筆跡をそのまま保持して表示
+        if (!demoOverride && completedUserStrokes.length > 0) {
+          ctx.save();
+          ctx.strokeStyle = "#142740";
+          ctx.lineWidth = lineW;
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+          completedUserStrokes.forEach(pts => {
+            if (!pts || pts.length < 2) return;
+            ctx.beginPath();
+            pts.forEach((p, idx) => idx === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+            ctx.stroke();
+          });
+          ctx.restore();
+        }
+
         if (!fitted || fitted.length === 0) {
+          // 筆順データが取得できない場合も子どもの筆跡を描画
+          if (userPoints.length > 1) {
+            ctx.save();
+            ctx.strokeStyle = "#2c6e49";
+            ctx.lineWidth = lineW;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.beginPath();
+            userPoints.forEach((p, idx) => idx === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+            ctx.stroke();
+            ctx.restore();
+          }
           document.getElementById("strokeGuideText").textContent = "教科書体の形を見ながら、正しい書き順で書いてみよう！";
           return;
         }
 
-        const lineW = Math.max(7, s * 0.025);
-
-        // 完了済みの画（教科書体の中心にピッタリ重なる藍色ライン）
-        ctx.save();
-        ctx.strokeStyle = "rgba(31, 58, 95, 0.82)";
-        ctx.lineWidth = lineW;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        for (let i = 0; i < currentStrokeIdx && i < fitted.length; i++) {
-          const pts = fitted[i];
-          ctx.beginPath();
-          pts.forEach((p, idx) => idx === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
-          ctx.stroke();
-        }
-        ctx.restore();
-
+        // 2. お手本再生中 or 次の画の始点・終点ガイド
         if (demoOverride) {
           ctx.save();
           ctx.strokeStyle = "rgba(184, 58, 45, 0.88)";
@@ -1312,6 +1303,7 @@
           ctx.restore();
         }
 
+        // 3. 今まさにタッチペンで書いている途中の線
         if (userPoints.length > 1) {
           ctx.save();
           ctx.strokeStyle = "#2c6e49";
@@ -1328,7 +1320,7 @@
         document.getElementById("strokeGuideText").textContent =
           rem > 0
             ? `${currentStrokeIdx + 1}画目：緑の「${currentStrokeIdx + 1}」から赤い点へなぞろう（あと ${rem} 画）`
-            : `全${fitted.length}画 完成！`;
+            : `全${fitted.length}画 完成！（自分の書いた字を確認しよう）`;
       }
 
       function getPos(e) {
@@ -1373,13 +1365,15 @@
           const d1 = Math.hypot(uSt.x - st.x, uSt.y - st.y);
           const d2 = Math.hypot(uEd.x - ed.x, uEd.y - ed.y);
           if (d1 <= tol && d2 <= tol) {
+            // 子どもが実際に書いた線の座標をそのまま保存し、お手本の線には置き換えない
+            completedUserStrokes.push(userPoints.slice());
             currentStrokeIdx += 1;
             userPoints = [];
             renderCanvas();
             if (currentStrokeIdx >= fitted.length) {
               const earned = window.onKanjiReward ? window.onKanjiReward(25, "stroke") : 25;
-              showBanner("learnFeedback", `🎉 書き順クリア！+${earned}コイン獲得！ステップ3（熟語チャレンジ）へ進むよ。`, true);
-              setTimeout(() => setStep(3), 900);
+              showBanner("learnFeedback", `🎉 書き順クリア！+${earned}コイン獲得！自分が書いた字を見て確認したらステップ3へ進もう。`, true);
+              setTimeout(() => setStep(3), 1300);
             }
             return;
           }
@@ -1426,6 +1420,7 @@
       async function resetStroke() {
         currentStrokeIdx = 0;
         userPoints = [];
+        completedUserStrokes = [];
         isDemoPlaying = false;
         setupCanvas();
         const k = KANJI_LIST[progress.currentIndex];
@@ -1810,7 +1805,6 @@
           sel.innerHTML = KANJI_LIST.map((k, idx) => `<option value="${idx}">${idx + 1}. ${k.char}（${k.onyomi}）</option>`).join("");
         }
         loadQuestion(1);
-        // Webフォント（Klee One）のロード完了後に教科書体座標を再フィット
         if (document.fonts && document.fonts.ready) {
           document.fonts.ready.then(() => {
             Object.keys(fittedCache).forEach(k => delete fittedCache[k]);
@@ -1936,7 +1930,7 @@
       });
     });
 
-    const STORAGE_KEY = "kanji_108_save_v7";
+    const STORAGE_KEY = "kanji_108_save_v8";
 
     function createInitialMonster(speciesId) {
       const sp = SPECIES_108.find(x => x.id === speciesId) || SPECIES_108[0];
