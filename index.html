@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>漢字道場＆百八霊獣伝（小学4年生・教科書体＆本格育成版）</title>
+  <title>漢字道場＆百八霊獣伝（小学4年生・東京書籍全202字＆1日6漢字）</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&display=swap" rel="stylesheet" />
@@ -64,6 +64,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
     .brand-badge {
@@ -190,6 +191,49 @@
       padding: 20px;
       box-shadow: var(--shadow-card);
       margin-bottom: 16px;
+    }
+
+    .daily-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: #f6f1e4;
+      border: 1.5px solid var(--border-strong);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      font-size: 0.86rem;
+      font-weight: 800;
+    }
+
+    .daily-dots { display: flex; gap: 6px; flex-wrap: wrap; }
+    .daily-dot {
+      min-width: 30px;
+      height: 30px;
+      padding: 0 6px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border-strong);
+      background: #fffdf8;
+      color: var(--ink-sub);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+    }
+    .daily-dot.done {
+      background: var(--mori-green);
+      color: #fffdf8;
+      border-color: #1f4f34;
+    }
+
+    .daily-lock-box {
+      text-align: center;
+      padding: 28px 18px;
+      background: #faf6ed;
+      border: 2px dashed var(--kin-gold);
+      border-radius: 16px;
     }
 
     .stepper { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 18px; }
@@ -479,11 +523,13 @@
     <div>
       <div class="brand-title">
         <span>漢字道場＆百八霊獣伝</span>
-        <span class="brand-badge">小学4年生・全108種</span>
+        <span class="brand-badge">東京書籍・全202字</span>
+        <span class="brand-badge">1日6漢字</span>
       </div>
-      <div class="brand-sub">教科書体（とめ・はね・はらい対応） ／ 五能力＆スキル強化・合成・ごほうび交換</div>
+      <div class="brand-sub">教科書体基準（とめ・はね・はらい対応） ／ 五能力＆スキル強化・合成・ごほうび交換</div>
     </div>
     <div class="header-stats">
+      <div class="stat-pill">📅 本日 <span id="dailyProgressHeader">0</span>/6字</div>
       <div class="stat-pill">🔥 <span id="comboCount">0</span>コンボ</div>
       <div class="stat-pill">🪙 <span id="coinCount">0</span>コイン</div>
       <button class="btn-verify-toggle" id="btnToggleVerify" onclick="toggleVerifyBar()">🛠️ 検証バー：ON</button>
@@ -499,8 +545,9 @@
       <button class="v-btn" id="vStep3" onclick="KanjiModule.jumpStep(3)">③ 熟語</button>
     </div>
     <div class="verify-group">
-      <span>漢字：</span>
+      <span>漢字(全202)：</span>
       <select class="v-select kyokasho" id="verifyKanjiSelect" onchange="KanjiModule.selectKanji(this.value)"></select>
+      <button class="v-btn" onclick="KanjiModule.resetDailyLimit()">🔄 本日枠リセット</button>
       <button class="v-btn" onclick="addTestCoins(1000)">🪙 +1000枚</button>
       <button class="v-btn" onclick="addTestPartyMonsters()">🧬 素材追加</button>
     </div>
@@ -518,63 +565,89 @@
     <!-- 1. 漢字れんしゅう（独立モジュール） -->
     <section id="tab-learn" class="tab-panel">
       <div class="card">
-        <div class="stepper">
-          <div class="step-item" id="stepInd1">① 読み方クイズ</div>
-          <div class="step-item" id="stepInd2">② 書き順なぞり</div>
-          <div class="step-item" id="stepInd3">③ 熟語チャレンジ（最大5個）</div>
-        </div>
-
-        <div class="kanji-header">
+        <div class="daily-bar">
           <div>
-            <div class="kanji-target">お題の漢字：「<span id="currentKanjiChar" class="kyokasho">海</span>」</div>
-            <div class="reading-hint kyokasho" id="currentKanjiReadings"></div>
+            <span>📅 今日の修行ノルマ（1日6漢字まで）</span>
+            <span id="totalMasteredText" style="margin-left:10px;color:var(--ai-indigo);font-size:0.8rem;"></span>
           </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn btn-secondary btn-sm" onclick="KanjiModule.prevKanji()">◀ 前の漢字</button>
-            <button class="btn btn-secondary btn-sm" onclick="KanjiModule.nextKanji()">次の漢字 ▶</button>
-          </div>
+          <div class="daily-dots" id="dailyDots"></div>
         </div>
 
-        <!-- ステップ1 -->
-        <div id="stepPanel1">
-          <p style="font-weight:800;margin:0 0 6px;">ステップ1：この漢字の正しい読み方の組み合わせを選ぼう！</p>
-          <p style="color:var(--ink-sub);margin:0 0 12px;font-size:0.88rem;">※同じ漢字でも言葉によって読み方が変わるよ。正しいものを選ぼう。</p>
-          <div class="choice-grid" id="choiceGrid"></div>
-        </div>
-
-        <!-- ステップ2 -->
-        <div id="stepPanel2" style="display:none;">
-          <div class="stroke-layout">
-            <div class="canvas-box-wrap">
-              <div class="canvas-box">
-                <canvas id="strokeCanvas"></canvas>
-              </div>
-            </div>
-            <div>
-              <h3 style="margin:0 0 8px;color:var(--ai-indigo-dark);">ステップ2：正しい書き順でなぞろう</h3>
-              <p id="strokeGuideText" style="font-weight:800;margin:0 0 10px;"></p>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
-                <button class="btn btn-gold btn-sm" onclick="KanjiModule.playDemo()">👀 お手本をゆっくり見る</button>
-                <button class="btn btn-secondary btn-sm" onclick="KanjiModule.resetStroke()">↺ 最初からやり直す</button>
-              </div>
-              <p style="font-size:0.84rem;color:var(--ink-sub);line-height:1.6;margin:0;">
-                ・教科書体の「とめ・はね・はらい」を意識しながら、緑の丸から赤い点へなぞろう。<br />
-                ・お気に入りの「スキル」を強化すると獲得コインが増えます。
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- ステップ3 -->
-        <div id="stepPanel3" style="display:none;">
-          <h3 style="margin:0 0 6px;color:var(--ai-indigo-dark);">ステップ3：熟語チャレンジ（最大5個・自動採点）</h3>
-          <p style="margin:0 0 12px;font-size:0.88rem;color:var(--ink-sub);">
-            「<strong id="idiomTargetChar" class="kyokasho" style="font-size:1.15rem;">海</strong>」を使った熟語を1文字ずつ書いてね。書き終わると自動で教科書体になり、上の欄につながるよ！
+        <!-- 1日6漢字達成ロック画面 -->
+        <div id="dailyLockView" class="daily-lock-box" style="display:none;">
+          <div style="font-size:2.4rem;margin-bottom:8px;">🎉🏆🎉</div>
+          <h2 style="margin:0 0 8px;color:var(--ai-indigo-dark);">本日の修行（6漢字）をすべて達成しました！</h2>
+          <p style="margin:0 0 16px;color:var(--ink-sub);font-weight:700;line-height:1.6;">
+            すごい集中力だね！また明日になると新しい6漢字に挑戦できるよ。<br />
+            今日は貯めたコインで「🐉 育成・強化」や「🎁 ごほうび交換所」を楽しもう！
           </p>
-          <div class="idiom-list" id="idiomList"></div>
-          <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-            <button class="btn btn-accent" id="btnAutoGrade" onclick="KanjiModule.gradeAll()">🔍 5つの熟語を自動採点する！</button>
-            <button class="btn btn-primary" onclick="KanjiModule.nextKanji()">次の漢字へ進む ▶</button>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="switchTab('raise')">🐉 霊獣を育成しにいく</button>
+            <button class="btn btn-gold" onclick="switchTab('reward')">🎁 ごほうび交換所を見る</button>
+          </div>
+        </div>
+
+        <!-- 通常学習エリア -->
+        <div id="learnActiveView">
+          <div class="stepper">
+            <div class="step-item" id="stepInd1">① 読み方クイズ</div>
+            <div class="step-item" id="stepInd2">② 書き順なぞり</div>
+            <div class="step-item" id="stepInd3">③ 熟語チャレンジ（最大5個）</div>
+          </div>
+
+          <div class="kanji-header">
+            <div>
+              <div style="font-size:0.78rem;font-weight:800;color:var(--kin-gold);" id="kanjiOrderBadge">東京書籍 第1問 / 202字</div>
+              <div class="kanji-target">お題の漢字：「<span id="currentKanjiChar" class="kyokasho"></span>」</div>
+              <div class="reading-hint kyokasho" id="currentKanjiReadings"></div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-secondary btn-sm" onclick="KanjiModule.prevKanji()">◀ 前の漢字</button>
+              <button class="btn btn-secondary btn-sm" onclick="KanjiModule.nextKanji(false)">次の漢字 ▶</button>
+            </div>
+          </div>
+
+          <!-- ステップ1 -->
+          <div id="stepPanel1">
+            <p style="font-weight:800;margin:0 0 6px;">ステップ1：この漢字の正しい読み方の組み合わせを選ぼう！</p>
+            <p style="color:var(--ink-sub);margin:0 0 12px;font-size:0.88rem;">※教科書体の「とめ・はね・はらい」もよく見ておこう。</p>
+            <div class="choice-grid" id="choiceGrid"></div>
+          </div>
+
+          <!-- ステップ2 -->
+          <div id="stepPanel2" style="display:none;">
+            <div class="stroke-layout">
+              <div class="canvas-box-wrap">
+                <div class="canvas-box">
+                  <canvas id="strokeCanvas"></canvas>
+                </div>
+              </div>
+              <div>
+                <h3 style="margin:0 0 8px;color:var(--ai-indigo-dark);">ステップ2：教科書体のお手本をなぞろう</h3>
+                <p id="strokeGuideText" style="font-weight:800;margin:0 0 10px;"></p>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+                  <button class="btn btn-gold btn-sm" onclick="KanjiModule.playDemo()">👀 お手本をゆっくり見る</button>
+                  <button class="btn btn-secondary btn-sm" onclick="KanjiModule.resetStroke()">↺ 最初からやり直す</button>
+                </div>
+                <p style="font-size:0.84rem;color:var(--ink-sub);line-height:1.6;margin:0;">
+                  ・うすい教科書体の文字を基準に、緑の数字から赤い点へ向かって1画ずつなぞろう。<br />
+                  ・とめ・はね・はらいの形を意識して書くとキレイに覚えられるよ！
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ステップ3 -->
+          <div id="stepPanel3" style="display:none;">
+            <h3 style="margin:0 0 6px;color:var(--ai-indigo-dark);">ステップ3：熟語チャレンジ（最大5個・自動採点）</h3>
+            <p style="margin:0 0 12px;font-size:0.88rem;color:var(--ink-sub);">
+              「<strong id="idiomTargetChar" class="kyokasho" style="font-size:1.15rem;"></strong>」を使った熟語を1文字ずつ書いてね。書き終わると自動で教科書体になり、上の欄につながるよ！
+            </p>
+            <div class="idiom-list" id="idiomList"></div>
+            <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+              <button class="btn btn-accent" id="btnAutoGrade" onclick="KanjiModule.gradeAll()">🔍 5つの熟語を自動採点する！</button>
+              <button class="btn btn-success" onclick="KanjiModule.completeAndNext()">✅ この漢字を完了して次へ（1日6字まで） ▶</button>
+            </div>
           </div>
         </div>
 
@@ -638,11 +711,11 @@
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
           <div>
             <label style="font-weight:800;font-size:0.85rem;display:block;margin-bottom:4px;">1体目の素材</label>
-            <select class="v-select" id="fuseSlot1" style="width:100%;color:var(--ink-main);background:#fff;border-color:var(--border-strong);"></select>
+            <select class="v-select" id="fuseSlot1" style="width:100%;max-width:none;color:var(--ink-main);background:#fff;border-color:var(--border-strong);"></select>
           </div>
           <div>
             <label style="font-weight:800;font-size:0.85rem;display:block;margin-bottom:4px;">2体目の素材</label>
-            <select class="v-select" id="fuseSlot2" style="width:100%;color:var(--ink-main);background:#fff;border-color:var(--border-strong);"></select>
+            <select class="v-select" id="fuseSlot2" style="width:100%;max-width:none;color:var(--ink-main);background:#fff;border-color:var(--border-strong);"></select>
           </div>
         </div>
         <button class="btn btn-accent" onclick="performFusion()">🔥 合成の儀を実行（100コイン）</button>
@@ -704,37 +777,179 @@
 
   <script>
     // =========================================================================
-    // 独立した漢字学習モジュール（標準筆順ベクター単一描画でズレ完全解消）
+    // 独立した漢字学習モジュール（東京書籍・全202字 ／ 1日6漢字制限 ／ 教科書体基準フィット）
     // =========================================================================
     const KanjiModule = (() => {
-      const KANJI_LIST = Object.freeze([
-        { char: "海", onyomi: "カイ", kunyomi: "うみ", choices: ["カイ ／ うみ", "コウ ／ かわ", "サイ ／ しま", "カイ ／ いけ"], answerIndex: 0 },
-        { char: "建", onyomi: "ケン・コン", kunyomi: "たてる・たつ", choices: ["ケン・コン ／ たてる", "シン・ジン ／ くる", "テン・デン ／ つくる", "カン・ガン ／ こわす"], answerIndex: 0 },
-        { char: "達", onyomi: "タツ", kunyomi: "たち", choices: ["タツ ／ たち", "レイ ／ とどく", "チョウ ／ とぶ", "シン ／ すすむ"], answerIndex: 0 },
-        { char: "愛", onyomi: "アイ", kunyomi: "", choices: ["アイ ／ （訓読みなし）", "エイ ／ かなしい", "ガイ ／ うれしい", "カイ ／ やさしい"], answerIndex: 0 },
-        { char: "機", onyomi: "キ", kunyomi: "はた", choices: ["キ ／ はた", "ギ ／ もり", "ケイ ／ ほし", "コウ ／ かぜ"], answerIndex: 0 },
-        { char: "関", onyomi: "カン", kunyomi: "せき・かかわる", choices: ["カン ／ せき・かかわる", "ゲン ／ とびら", "モン ／ かど", "セン ／ しまる"], answerIndex: 0 },
-        { char: "選", onyomi: "セン", kunyomi: "えらぶ", choices: ["セン ／ えらぶ", "レン ／ まねる", "ケン ／ みる", "テン ／ さがす"], answerIndex: 0 },
-        { char: "特", onyomi: "トク", kunyomi: "", choices: ["トク ／ （訓読みなし）", "ドク ／ わける", "コク ／ くらべる", "ソク ／ むすぶ"], answerIndex: 0 },
-        { char: "漁", onyomi: "ギョ・リョウ", kunyomi: "あさる", choices: ["ギョ・リョウ ／ あさる", "キョ ／ しま", "リョ ／ かわ", "ショウ ／ つり"], answerIndex: 0 },
-        { char: "産", onyomi: "サン", kunyomi: "うむ・うまれる", choices: ["サン ／ うむ・うまれる", "シン ／ そだつ", "セン ／ いのち", "ラン ／ とる"], answerIndex: 0 }
-      ]);
+      const DAILY_LIMIT = 6;
+      const KANJI_PROGRESS_KEY = "kanji_tokyoshoseki_202_v1";
+
+      // 東京書籍 小学4年生配当漢字（単元・配当順ベース）
+      const TOKYO_SHOSEKI_ORDER = [
+        "好","芽","巣","材","笑","泣","信","以","伝","念","折","試","験","連","続",
+        "初","変","管","底","愛","害","周","囲","民","司","令","和","府","県","庁",
+        "都","道","埼","玉","茨","城","栃","木","群","馬","千","葉","神","奈","川",
+        "新","潟","富","山","石","福","井","長","野","岐","阜","静","岡","知","三",
+        "重","滋","賀","京","大","阪","兵","庫","良","歌","鳥","取","島","根","広",
+        "口","徳","香","媛","高","佐","崎","熊","本","宮","鹿","児","沖","縄","関",
+        "係","必","要","類","型","観","察","案","内","席","議","論","説","挙","賛",
+        "成","否","決","果","未","来","過","去","昨","晩","祝","祭","典","礼","節",
+        "季","候","順","位","置","側","辺","角","径","円","面","積","量","倍","差",
+        "残","約","束","達","建","設","造","機","械","器","具","料","費","用","利",
+        "便","働","労","努","力","功","栄","養","育","健","康","胃","腸","脈","薬",
+        "治","療","老","孫","夫","婦","娘","仲","友","協","助","救","護","防","災",
+        "危","険","警","官","法","規","則","禁","止","許","認","証","印","票","札",
+        "貨","貯","蔵","博","館","歴","史","戦","争","勝","敗","軍","隊","旗","勇",
+        "敢","望","希","願","夢","輝","光","景","象","兆","陸","海","波","塩","漁",
+        "港","航","船","灯","標","街","区","商","店","売","買","客","品","種","選",
+        "特","別","単","純","優","秀","極","最","末","完"
+      ];
+
+      // 文部科学省 学習指導要領 第4学年配当漢字 正味202字リスト
+      const RAW_4TH_GRADE_202 = [
+        "愛","案","以","衣","位","囲","胃","印","英","栄","塩","億","加","果","貨","課","芽","改","械","害",
+        "街","各","覚","完","官","管","関","観","願","希","季","紀","喜","旗","器","機","議","求","泣","救",
+        "給","挙","漁","共","協","鏡","競","極","訓","軍","郡","径","型","景","芸","欠","結","建","健","験",
+        "固","功","好","候","航","康","告","差","菜","最","材","昨","札","刷","殺","察","参","産","散","残",
+        "士","氏","史","司","試","児","治","辞","失","借","種","周","祝","順","初","松","笑","唱","焼","象",
+        "照","賞","臣","信","成","省","清","静","席","積","折","節","説","浅","戦","選","然","争","倉","巣",
+        "束","側","続","卒","孫","帯","隊","達","単","置","仲","貯","兆","腸","低","底","停","的","典","伝",
+        "徒","努","灯","堂","働","特","得","毒","熱","念","敗","梅","博","飯","飛","費","必","票","標","不",
+        "夫","付","府","副","粉","兵","別","辺","変","便","包","法","望","牧","末","満","未","脈","民","無",
+        "約","勇","要","養","浴","利","陸","良","料","量","輪","類","令","冷","例","歴","連","老","労","録"
+      ];
+
+      // 東京書籍配列順に並び替え（ちょうど202字）
+      const ORDERED_CHARS = [];
+      const seenSet = new Set();
+      TOKYO_SHOSEKI_ORDER.forEach(ch => {
+        if (RAW_4TH_GRADE_202.includes(ch) && !seenSet.has(ch)) {
+          seenSet.add(ch);
+          ORDERED_CHARS.push(ch);
+        }
+      });
+      RAW_4TH_GRADE_202.forEach(ch => {
+        if (!seenSet.has(ch)) {
+          seenSet.add(ch);
+          ORDERED_CHARS.push(ch);
+        }
+      });
+
+      const READING_DICT = {
+        "愛":["アイ",""],"案":["アン",""],"以":["イ",""],"衣":["イ","ころも"],"位":["イ","くらい"],
+        "囲":["イ","かこむ・かこう"],"胃":["イ",""],"印":["イン","しるし"],"英":["エイ",""],"栄":["エイ","さかえる・はえ"],
+        "塩":["エン","しお"],"億":["オク",""],"加":["カ","くわえる・くわわる"],"果":["カ","はたす・はてる"],"貨":["カ",""],
+        "課":["カ",""],"芽":["ガ","め"],"改":["カイ","あらためる・あらたまる"],"械":["カイ",""],"害":["ガイ",""],
+        "街":["ガイ・カイ","まち"],"各":["カク","おのおの"],"覚":["カク","おぼえる・さめる"],"完":["カン",""],"官":["カン",""],
+        "管":["カン","くだ"],"関":["カン","せき・かかわる"],"観":["カン",""],"願":["ガン","ねがう"],"希":["キ",""],
+        "季":["キ",""],"紀":["キ",""],"喜":["キ","よろこぶ"],"旗":["キ","はた"],"器":["キ","うつわ"],
+        "機":["キ","はた"],"議":["ギ",""],"求":["キュウ","もとめる"],"泣":["キュウ","なく"],"救":["キュウ","すくう"],
+        "給":["キュウ",""],"挙":["キョ","あげる・あがる"],"漁":["ギョ・リョウ","あさる"],"共":["キョウ","とも"],"協":["キョウ",""],
+        "鏡":["キョウ","かがみ"],"競":["キョウ・ケイ","きそう・せる"],"極":["キョク・ゴク","きわめる・きわまる"],"訓":["クン",""],"軍":["グン",""],
+        "郡":["グン",""],"径":["ケイ",""],"型":["ケイ","かた"],"景":["ケイ",""],"芸":["ゲイ",""],
+        "欠":["ケツ","かける・かく"],"結":["ケツ","むすぶ・ゆう"],"建":["ケン・コン","たてる・たつ"],"健":["ケン","すこやか"],"験":["ケン・ゲン",""],
+        "固":["コ","かためる・かたまる"],"功":["コウ・ク",""],"好":["コウ","このむ・すく"],"候":["コウ","そうろう"],"航":["コウ",""],
+        "康":["コウ",""],"告":["コク","つげる"],"差":["サ","さす"],"菜":["サイ","な"],"最":["サイ","もっとも"],
+        "材":["ザイ",""],"昨":["サク",""],"札":["サツ","ふだ"],"刷":["サツ","する"],"殺":["サツ・サイ","ころす"],
+        "察":["サツ",""],"参":["サン","まいる"],"産":["サン","うむ・うまれる"],"散":["サン","ちる・ちらす"],"残":["ザン","のこる・のこす"],
+        "士":["シ",""],"氏":["シ","うじ"],"史":["シ",""],"司":["シ",""],"試":["シ","こころみる・ためす"],
+        "児":["ジ・ニ",""],"治":["ジ・チ","おさまる・なおる"],"辞":["ジ","やめる"],"失":["シツ","うしなう"],"借":["シャク","かりる"],
+        "種":["シュ","たね"],"周":["シュウ","まわり"],"祝":["シュク・シュウ","いわう"],"順":["ジュン",""],"初":["ショ","はじめ・はじめて"],
+        "松":["ショウ","まつ"],"笑":["ショウ","わらう・えむ"],"唱":["ショウ","となえる"],"焼":["ショウ","やく・やける"],"象":["ショウ・ゾウ",""],
+        "照":["ショウ","てる・てらす"],"賞":["ショウ",""],"臣":["シン・ジン",""],"信":["シン",""],"成":["セイ・ジョウ","なる・なす"],
+        "省":["セイ・ショウ","かえりみる・はぶく"],"清":["セイ・ショウ","きよい・きよまる"],"静":["セイ・ジョウ","しずか"],"席":["セキ",""],"積":["セキ","つむ・つもる"],
+        "折":["セツ","おる・おれる"],"節":["セツ・セチ","ふし"],"説":["セツ・ゼイ","とく"],"浅":["セン","あさい"],"戦":["セン","いくさ・たたかう"],
+        "選":["セン","えらぶ"],"然":["ゼン・ネン",""],"争":["ソウ","あらそう"],"倉":["ソウ","くら"],"巣":["ソウ","す"],
+        "束":["ソク","たば"],"側":["ソク","かわ"],"続":["ゾク","つづく・つづける"],"卒":["ソツ",""],"孫":["ソン","まご"],
+        "帯":["タイ","おびる・おび"],"隊":["タイ",""],"達":["タツ","たち"],"単":["タン",""],"置":["チ","おく"],
+        "仲":["チュウ","なか"],"貯":["チョ",""],"兆":["チョウ","きざす・きざし"],"腸":["チョウ",""],"低":["テイ","ひくい"],
+        "底":["テイ","そこ"],"停":["テイ",""],"的":["テキ","まと"],"典":["テン",""],"伝":["デン","つたわる・つたえる"],
+        "徒":["ト",""],"努":["ド","つとめる"],"灯":["トウ","ひ"],"堂":["ドウ",""],"働":["ドウ","はたらく"],
+        "特":["トク",""],"得":["トク","える・うる"],"毒":["ドク",""],"熱":["ネツ","あつい"],"念":["ネン",""],
+        "敗":["ハイ","やぶれる"],"梅":["バイ","うめ"],"博":["ハク・バク",""],"飯":["ハン","めし"],"飛":["ヒ","とぶ・とばす"],
+        "費":["ヒ","ついやす・ついえる"],"必":["ヒツ","かならず"],"票":["ヒョウ",""],"標":["ヒョウ",""],"不":["フ・ブ",""],
+        "夫":["フ・フウ","おっと"],"付":["フ","つける・つく"],"府":["フ",""],"副":["フク",""],"粉":["フン","こ・こな"],
+        "兵":["ヒョウ・ヘイ",""],"別":["ベツ","わかれる"],"辺":["ヘン","あたり・べ"],"変":["ヘン","かわる・かえる"],"便":["ベン・ビン","たより"],
+        "包":["ホウ","つつむ"],"法":["ホウ・ハッ",""],"望":["ボウ・モウ","のぞむ"],"牧":["ボク","まき"],"末":["マツ・バツ","すえ"],
+        "満":["マン","みちる・みたす"],"未":["ミ",""],"脈":["ミャク",""],"民":["ミン","たみ"],"無":["ム・ブ","ない"],
+        "約":["ヤク",""],"勇":["ユウ","いさむ"],"要":["ヨウ","いる・かなめ"],"養":["ヨウ","やしなう"],"浴":["ヨク","あびる・あびせる"],
+        "利":["リ","きく"],"陸":["リク",""],"良":["リョウ","よい"],"料":["リョウ",""],"量":["リョウ","はかる"],
+        "輪":["リン","わ"],"類":["ルイ","たぐい"],"令":["レイ",""],"冷":["レイ","つめたい・ひえる"],"例":["レイ","たとえる"],
+        "歴":["レキ",""],"連":["レン","つらなる・つれる"],"老":["ロウ","おいる・ふける"],"労":["ロウ",""],"録":["ロク",""]
+      };
+
+      const KANJI_LIST = ORDERED_CHARS.map((ch, idx) => {
+        const [on, kun] = READING_DICT[ch] || ["オン", "くん"];
+        const correctLabel = `${on} ／ ${kun || "（訓読みなし）"}`;
+        const distractors = [];
+        for (let step = 1; distractors.length < 3; step++) {
+          const otherCh = ORDERED_CHARS[(idx + step * 17) % ORDERED_CHARS.length];
+          const [oOn, oKun] = READING_DICT[otherCh] || ["コウ", "かわ"];
+          const cand = `${oOn} ／ ${oKun || "（訓読みなし）"}`;
+          if (cand !== correctLabel && !distractors.includes(cand)) {
+            distractors.push(cand);
+          }
+        }
+        const choices = [correctLabel, ...distractors];
+        const answerIndex = idx % 4;
+        if (answerIndex !== 0) {
+          [choices[0], choices[answerIndex]] = [choices[answerIndex], choices[0]];
+        }
+        return { char: ch, onyomi: on, kunyomi: kun, choices, answerIndex };
+      });
 
       const LOCAL_IDIOMS = new Set([
-        "海原", "海外", "海岸", "海辺", "海底", "海面", "海水", "海風", "海洋", "海戦", "海賊", "日本海", "瀬戸内海", "深海", "南海", "北海", "東海", "臨海",
-        "建築", "建設", "建物", "建造", "再建", "新建", "建て前",
-        "発達", "到達", "伝達", "達人", "上達", "未達", "速達", "配達",
-        "愛情", "愛着", "愛読", "愛犬", "愛車", "愛国", "純愛", "慈愛", "恋愛", "友愛",
-        "機械", "機関", "機能", "危機", "機会", "飛行機", "電機", "動機", "有機", "無機",
-        "関係", "関心", "関連", "関所", "玄関", "無関心", "関門",
-        "選択", "選手", "当選", "選挙", "選出", "精選", "特選", "選抜", "厳選",
-        "特別", "特殊", "特急", "特技", "特徴", "特産", "特権", "特訓", "特売",
-        "漁業", "漁港", "漁師", "漁船", "漁場", "漁獲", "遠洋漁業", "定置漁業",
-        "生産", "産業", "水産", "畜産", "農産", "産物", "出産", "原産", "特産", "国産", "財産"
+        "海原","海外","海岸","海辺","海底","海面","海水","海風","海洋","日本海","深海",
+        "建築","建設","建物","建造","再建","発達","到達","伝達","達人","上達","速達","配達",
+        "愛情","愛着","愛読","愛犬","愛車","愛国","純愛","慈愛","恋愛","友愛",
+        "機械","機関","機能","危機","機会","飛行機","電機","動機","有機","無機",
+        "関係","関心","関連","関所","玄関","無関心","関門","選択","選手","当選","選挙","選出","精選","特選","選抜",
+        "特別","特殊","特急","特技","特徴","特産","特権","特訓","特売","漁業","漁港","漁師","漁船","漁場","漁獲",
+        "生産","産業","水産","畜産","農産","産物","出産","原産","国産","財産","好意","友好","好き","芽生え","新芽",
+        "鳥の巣","材料","木材","笑顔","大笑い","泣き声","信用","自信","信頼","以上","以下","以内","以前","伝言","伝統",
+        "記念","残念","念願","折り紙","試験","実験","経験","連絡","連続","最初","変化","大変","管理","水道管",
+        "公害","周囲","範囲","国民","市民","司令","命令","平和","和食","都道府県","観察","案内","座席","会議",
+        "議論","説明","賛成","完成","決定","結果","未来","過去","現在","昨日","今晩","祝日","お祭り","辞典",
+        "礼儀","季節","気候","順番","位置","外側","辺り","角度","半径","円周","面積","分量","倍増","差額",
+        "約束","器具","料理","費用","利用","便利","労働","努力","成功","栄養","教育","健康","薬局","治療","老人",
+        "孫娘","夫婦","仲間","友情","協力","救助","保護","防災","災害","危険","警察","法律","規則","禁止","許可",
+        "確認","証明","印鑑","投票","お札","貨物","貯金","冷蔵庫","博物館","歴史","戦争","競争","勝利","失敗","軍隊",
+        "国旗","勇気","希望","願い","夢中","輝き","日光","風景","現象","陸上","塩分","港町","航空","灯台","目標",
+        "市街","区別","商店","店員","売買","お客","商品","種類","単純","優良","優秀","極端","最後","完全"
       ]);
 
+      function getTodayKey() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      }
+
+      let progress = {
+        date: getTodayKey(),
+        todayCompletedChars: [],
+        masteredChars: [],
+        currentIndex: 0
+      };
+
+      function loadProgress() {
+        try {
+          const raw = localStorage.getItem(KANJI_PROGRESS_KEY);
+          if (raw) {
+            const p = JSON.parse(raw);
+            progress = { ...progress, ...p };
+          }
+        } catch (e) {}
+        const today = getTodayKey();
+        if (progress.date !== today) {
+          progress.date = today;
+          progress.todayCompletedChars = [];
+          saveProgress();
+        }
+      }
+
+      function saveProgress() {
+        try { localStorage.setItem(KANJI_PROGRESS_KEY, JSON.stringify(progress)); } catch (e) {}
+      }
+
       const strokeCache = {};
-      let kanjiIndex = 0;
       let step = 1;
       let strokeCanvas = null;
       let strokeCtx = null;
@@ -753,6 +968,42 @@
         judgeText: "",
         judgeClass: ""
       }));
+
+      // 教科書体フォントの実際の描画範囲を計測し、書き順座標を教科書体側へ完全一致させる
+      function measureKyokashoBounds(char, size) {
+        const off = document.createElement("canvas");
+        off.width = size;
+        off.height = size;
+        const octx = off.getContext("2d");
+        octx.fillStyle = "#000000";
+        octx.font = `600 ${Math.round(size * 0.78)}px "UD Digi Kyokasho N-R", "UD デジタル 教科書体 N-R", "YuKyokasho", "游教科書体", "Klee One", serif`;
+        octx.textAlign = "center";
+        octx.textBaseline = "middle";
+        octx.fillText(char, size / 2, size / 2 + size * 0.03);
+
+        const img = octx.getImageData(0, 0, size, size).data;
+        let minX = size, minY = size, maxX = 0, maxY = 0, found = false;
+        for (let y = 0; y < size; y++) {
+          for (let x = 0; x < size; x++) {
+            if (img[(y * size + x) * 4 + 3] > 20) {
+              if (x < minX) minX = x;
+              if (y < minY) minY = y;
+              if (x > maxX) maxX = x;
+              if (y > maxY) maxY = y;
+              found = true;
+            }
+          }
+        }
+        if (!found) {
+          return { minX: size * 0.14, minY: size * 0.14, width: size * 0.72, height: size * 0.72 };
+        }
+        return {
+          minX,
+          minY,
+          width: Math.max(10, maxX - minX),
+          height: Math.max(10, maxY - minY)
+        };
+      }
 
       async function fetchKanjiStrokes(char) {
         if (strokeCache[char]) return strokeCache[char];
@@ -775,27 +1026,60 @@
           svgEl.style.height = "109px";
           document.body.appendChild(svgEl);
 
-          const parsedStrokes = paths.map(p => {
+          let rawMinX = Infinity, rawMinY = Infinity, rawMaxX = -Infinity, rawMaxY = -Infinity;
+          const rawStrokes = paths.map(p => {
             const d = p.getAttribute("d");
             const clone = document.createElementNS("http://www.w3.org/2000/svg", "path");
             clone.setAttribute("d", d);
             svgEl.appendChild(clone);
             const totalLen = clone.getTotalLength();
-            const steps = Math.max(16, Math.ceil(totalLen / 2.5));
+            const steps = Math.max(18, Math.ceil(totalLen / 2.2));
             const pts = [];
             for (let i = 0; i <= steps; i++) {
               const pt = clone.getPointAtLength((totalLen * i) / steps);
-              pts.push({ x: pt.x / 109, y: pt.y / 109 });
+              if (pt.x < rawMinX) rawMinX = pt.x;
+              if (pt.y < rawMinY) rawMinY = pt.y;
+              if (pt.x > rawMaxX) rawMaxX = pt.x;
+              if (pt.y > rawMaxY) rawMaxY = pt.y;
+              pts.push({ x: pt.x, y: pt.y });
             }
-            return { d, pts };
+            return pts;
           });
 
           document.body.removeChild(svgEl);
-          strokeCache[char] = parsedStrokes;
-          return parsedStrokes;
+
+          const spanX = Math.max(1, rawMaxX - rawMinX);
+          const spanY = Math.max(1, rawMaxY - rawMinY);
+          const normalized = rawStrokes.map(pts =>
+            pts.map(p => ({
+              nx: (p.x - rawMinX) / spanX,
+              ny: (p.y - rawMinY) / spanY
+            }))
+          );
+
+          strokeCache[char] = normalized;
+          return normalized;
         } catch (e) {
           return null;
         }
+      }
+
+      function getFittedStrokes(char, size) {
+        const normStrokes = strokeCache[char];
+        if (!normStrokes) return null;
+        const box = measureKyokashoBounds(char, size);
+        const inset = Math.min(box.width, box.height) * 0.055;
+        const left = box.minX + inset;
+        const top = box.minY + inset;
+        const w = Math.max(10, box.width - inset * 2);
+        const h = Math.max(10, box.height - inset * 2);
+
+        return normStrokes.map(pts =>
+          pts.map(p => ({
+            x: left + p.nx * w,
+            y: top + p.ny * h
+          }))
+        );
       }
 
       function setupCanvas() {
@@ -827,22 +1111,14 @@
         ctx.restore();
       }
 
-      function drawStrokeList(ctx, strokes, toPx, color, lineWidth) {
+      // 下絵の基準は常に教科書体フォント
+      function drawKyokashoBase(ctx, s, char) {
         ctx.save();
-        ctx.strokeStyle = color;
-        ctx.lineWidth = lineWidth;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        strokes.forEach(st => {
-          const pts = st.pts || st;
-          if (!pts || pts.length === 0) return;
-          ctx.beginPath();
-          pts.forEach((p, idx) => {
-            const q = toPx(p);
-            idx === 0 ? ctx.moveTo(q.x, q.y) : ctx.lineTo(q.x, q.y);
-          });
-          ctx.stroke();
-        });
+        ctx.fillStyle = "#dfd7c5";
+        ctx.font = `600 ${Math.round(s * 0.78)}px "UD Digi Kyokasho N-R", "UD デジタル 教科書体 N-R", "YuKyokasho", "游教科書体", "Klee One", serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(char, s / 2, s / 2 + s * 0.03);
         ctx.restore();
       }
 
@@ -851,70 +1127,73 @@
         if (!strokeCtx) return;
         const s = canvasSize;
         const ctx = strokeCtx;
-        const k = KANJI_LIST[kanjiIndex];
+        const k = KANJI_LIST[progress.currentIndex];
 
         ctx.clearRect(0, 0, s, s);
         drawGrid(ctx, s);
+        drawKyokashoBase(ctx, s, k.char);
 
-        // オフライン等でKanjiVGが取れない場合のみ教科書体フォントを描画
-        if (!activeStrokes || activeStrokes.length === 0) {
-          ctx.save();
-          ctx.fillStyle = "#e5dec9";
-          ctx.font = `600 ${Math.round(s * 0.78)}px "UD Digi Kyokasho N-R", "UD デジタル 教科書体 N-R", "YuKyokasho", "游教科書体", "Klee One", serif`;
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillText(k.char, s / 2, s / 2 + s * 0.03);
-          ctx.restore();
+        const fitted = getFittedStrokes(k.char, s);
+        if (!fitted || fitted.length === 0) {
           document.getElementById("strokeGuideText").textContent = "教科書体の形を見ながら、正しい書き順で書いてみよう！";
           return;
         }
 
-        const pad = s * 0.09;
-        const inner = s - pad * 2;
-        const toPx = pt => ({ x: pad + pt.x * inner, y: pad + pt.y * inner });
-        const baseWidth = Math.max(11, s * 0.038);
+        const lineW = Math.max(8, s * 0.028);
 
-        // 1. 全体の下絵（薄グレー・ベクター単一座標系なのでズレゼロ）
-        drawStrokeList(ctx, activeStrokes, toPx, "#e4ddd0", baseWidth + 2);
-
-        // 2. すでに書き終えた画（藍色）
-        if (currentStrokeIdx > 0) {
-          drawStrokeList(ctx, activeStrokes.slice(0, currentStrokeIdx), toPx, "#1f3a5f", baseWidth);
+        ctx.save();
+        ctx.strokeStyle = "rgba(31, 58, 95, 0.78)";
+        ctx.lineWidth = lineW;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        for (let i = 0; i < currentStrokeIdx && i < fitted.length; i++) {
+          const pts = fitted[i];
+          ctx.beginPath();
+          pts.forEach((p, idx) => idx === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+          ctx.stroke();
         }
+        ctx.restore();
 
-        // 3. お手本再生中 or 次に書く画のガイド
         if (demoOverride) {
-          drawStrokeList(ctx, demoOverride, toPx, "#b83a2d", baseWidth);
-        } else if (currentStrokeIdx < activeStrokes.length) {
-          const curPts = activeStrokes[currentStrokeIdx].pts;
-          drawStrokeList(ctx, [curPts], toPx, "rgba(44, 110, 73, 0.28)", baseWidth + 2);
-
-          const st = toPx(curPts[0]);
-          const ed = toPx(curPts[curPts.length - 1]);
+          ctx.save();
+          ctx.strokeStyle = "rgba(184, 58, 45, 0.85)";
+          ctx.lineWidth = lineW + 1;
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+          demoOverride.forEach(pts => {
+            if (!pts || pts.length === 0) return;
+            ctx.beginPath();
+            pts.forEach((p, idx) => idx === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+            ctx.stroke();
+          });
+          ctx.restore();
+        } else if (currentStrokeIdx < fitted.length) {
+          const curPts = fitted[currentStrokeIdx];
+          const st = curPts[0];
+          const ed = curPts[curPts.length - 1];
 
           ctx.save();
           ctx.fillStyle = "#2c6e49";
           ctx.beginPath();
-          ctx.arc(st.x, st.y, 13, 0, Math.PI * 2);
+          ctx.arc(st.x, st.y, 12, 0, Math.PI * 2);
           ctx.fill();
           ctx.fillStyle = "#ffffff";
-          ctx.font = "bold 12px sans-serif";
+          ctx.font = "bold 11px sans-serif";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
           ctx.fillText(String(currentStrokeIdx + 1), st.x, st.y);
 
           ctx.fillStyle = "#b83a2d";
           ctx.beginPath();
-          ctx.arc(ed.x, ed.y, 6.5, 0, Math.PI * 2);
+          ctx.arc(ed.x, ed.y, 6, 0, Math.PI * 2);
           ctx.fill();
           ctx.restore();
         }
 
-        // 4. ユーザーが今なぞっている線
         if (userPoints.length > 1) {
           ctx.save();
           ctx.strokeStyle = "#2c6e49";
-          ctx.lineWidth = Math.max(9, s * 0.032);
+          ctx.lineWidth = lineW;
           ctx.lineCap = "round";
           ctx.lineJoin = "round";
           ctx.beginPath();
@@ -923,11 +1202,11 @@
           ctx.restore();
         }
 
-        const rem = Math.max(0, activeStrokes.length - currentStrokeIdx);
+        const rem = Math.max(0, fitted.length - currentStrokeIdx);
         document.getElementById("strokeGuideText").textContent =
           rem > 0
             ? `${currentStrokeIdx + 1}画目：緑の「${currentStrokeIdx + 1}」から赤い点へなぞろう（あと ${rem} 画）`
-            : `全${activeStrokes.length}画 完成！`;
+            : `全${fitted.length}画 完成！`;
       }
 
       function getPos(e) {
@@ -957,13 +1236,13 @@
       function onPointerUp() {
         if (!isDrawing) return;
         isDrawing = false;
-        if (!activeStrokes || currentStrokeIdx >= activeStrokes.length) return;
+        const k = KANJI_LIST[progress.currentIndex];
+        const fitted = getFittedStrokes(k.char, canvasSize);
+        if (!fitted || currentStrokeIdx >= fitted.length) return;
 
-        const pad = canvasSize * 0.09;
-        const inner = canvasSize - pad * 2;
-        const curPts = activeStrokes[currentStrokeIdx].pts;
-        const st = { x: pad + curPts[0].x * inner, y: pad + curPts[0].y * inner };
-        const ed = { x: pad + curPts[curPts.length - 1].x * inner, y: pad + curPts[curPts.length - 1].y * inner };
+        const curPts = fitted[currentStrokeIdx];
+        const st = curPts[0];
+        const ed = curPts[curPts.length - 1];
         const tol = canvasSize * 0.22;
 
         if (userPoints.length >= 2) {
@@ -975,7 +1254,7 @@
             currentStrokeIdx += 1;
             userPoints = [];
             renderCanvas();
-            if (currentStrokeIdx >= activeStrokes.length) {
+            if (currentStrokeIdx >= fitted.length) {
               const earned = window.onKanjiReward ? window.onKanjiReward(25, "stroke") : 25;
               showBanner("learnFeedback", `🎉 書き順クリア！+${earned}コイン獲得！ステップ3（熟語チャレンジ）へ進むよ。`, true);
               setTimeout(() => setStep(3), 900);
@@ -989,7 +1268,9 @@
       }
 
       function playDemo() {
-        if (isDemoPlaying || !activeStrokes || activeStrokes.length === 0) return;
+        const k = KANJI_LIST[progress.currentIndex];
+        const fitted = getFittedStrokes(k.char, canvasSize);
+        if (isDemoPlaying || !fitted || fitted.length === 0) return;
         isDemoPlaying = true;
         let sIdx = 0;
         let pIdx = 0;
@@ -997,12 +1278,12 @@
 
         function tick() {
           if (!isDemoPlaying) return;
-          if (sIdx >= activeStrokes.length) {
+          if (sIdx >= fitted.length) {
             isDemoPlaying = false;
             setTimeout(() => renderCanvas(), 500);
             return;
           }
-          const pts = activeStrokes[sIdx].pts;
+          const pts = fitted[sIdx];
           if (!drawn[sIdx]) drawn[sIdx] = [];
           drawn[sIdx].push(pts[pIdx]);
           renderCanvas(drawn);
@@ -1025,7 +1306,7 @@
         userPoints = [];
         isDemoPlaying = false;
         setupCanvas();
-        const k = KANJI_LIST[kanjiIndex];
+        const k = KANJI_LIST[progress.currentIndex];
         activeStrokes = await fetchKanjiStrokes(k.char);
         renderCanvas();
       }
@@ -1219,7 +1500,7 @@
           }
         } catch (e) {}
 
-        if (!cands.length) cands = [KANJI_LIST[kanjiIndex].char, "日", "本", "山", "川"];
+        if (!cands.length) cands = [KANJI_LIST[progress.currentIndex].char, "日", "本", "山", "川"];
         sl.candidates = cands;
         sl.word += cands[0];
         sl.currentStrokes = [];
@@ -1243,7 +1524,7 @@
       }
 
       async function gradeAll() {
-        const targetChar = KANJI_LIST[kanjiIndex].char;
+        const targetChar = KANJI_LIST[progress.currentIndex].char;
         const seen = new Set();
         let correctCount = 0;
 
@@ -1281,6 +1562,37 @@
         }
       }
 
+      function updateDailyUI() {
+        loadProgress();
+        const doneCount = progress.todayCompletedChars.length;
+        const headerEl = document.getElementById("dailyProgressHeader");
+        if (headerEl) headerEl.textContent = String(doneCount);
+
+        const totalEl = document.getElementById("totalMasteredText");
+        if (totalEl) totalEl.textContent = `（累計習得：${progress.masteredChars.length} / ${KANJI_LIST.length}字）`;
+
+        const dotsEl = document.getElementById("dailyDots");
+        if (dotsEl) {
+          dotsEl.innerHTML = "";
+          for (let i = 0; i < DAILY_LIMIT; i++) {
+            const dot = document.createElement("span");
+            const ch = progress.todayCompletedChars[i];
+            dot.className = "daily-dot kyokasho" + (ch ? " done" : "");
+            dot.textContent = ch || String(i + 1);
+            dotsEl.appendChild(dot);
+          }
+        }
+
+        const isLocked = doneCount >= DAILY_LIMIT;
+        const lockView = document.getElementById("dailyLockView");
+        const activeView = document.getElementById("learnActiveView");
+        if (lockView && activeView) {
+          lockView.style.display = isLocked ? "block" : "none";
+          activeView.style.display = isLocked ? "none" : "block";
+        }
+        return isLocked;
+      }
+
       function setStep(stepNum) {
         step = stepNum;
         [1, 2, 3].forEach(n => {
@@ -1301,7 +1613,7 @@
       }
 
       function checkReading(idx, btn) {
-        const k = KANJI_LIST[kanjiIndex];
+        const k = KANJI_LIST[progress.currentIndex];
         const allBtns = document.querySelectorAll("#choiceGrid .choice-btn");
         allBtns.forEach(b => b.disabled = true);
 
@@ -1320,12 +1632,14 @@
       }
 
       async function loadQuestion(targetStep = 1) {
-        const k = KANJI_LIST[kanjiIndex];
+        const isLocked = updateDailyUI();
+        const k = KANJI_LIST[progress.currentIndex];
+        document.getElementById("kanjiOrderBadge").textContent = `東京書籍 第${progress.currentIndex + 1}問 / ${KANJI_LIST.length}字`;
         document.getElementById("currentKanjiChar").textContent = k.char;
         document.getElementById("currentKanjiReadings").textContent = `音読み：${k.onyomi} ／ 訓読み：${k.kunyomi || "なし"}`;
         document.getElementById("idiomTargetChar").textContent = k.char;
         const sel = document.getElementById("verifyKanjiSelect");
-        if (sel) sel.value = String(kanjiIndex);
+        if (sel) sel.value = String(progress.currentIndex);
         hideBanner("learnFeedback");
 
         const grid = document.getElementById("choiceGrid");
@@ -1340,10 +1654,35 @@
 
         initIdiomSlots();
         setStep(targetStep);
-        await resetStroke();
+        if (!isLocked) {
+          await resetStroke();
+        }
+      }
+
+      function completeAndNext() {
+        loadProgress();
+        const k = KANJI_LIST[progress.currentIndex];
+        if (!progress.todayCompletedChars.includes(k.char)) {
+          progress.todayCompletedChars.push(k.char);
+        }
+        if (!progress.masteredChars.includes(k.char)) {
+          progress.masteredChars.push(k.char);
+        }
+        progress.currentIndex = (progress.currentIndex + 1) % KANJI_LIST.length;
+        saveProgress();
+        loadQuestion(1);
+      }
+
+      function resetDailyLimit() {
+        progress.date = getTodayKey();
+        progress.todayCompletedChars = [];
+        saveProgress();
+        loadQuestion(1);
+        showBanner("learnFeedback", "🔄 本日の学習枠（6漢字）をリセットしました！", true);
       }
 
       function init() {
+        loadProgress();
         const sel = document.getElementById("verifyKanjiSelect");
         if (sel) {
           sel.innerHTML = KANJI_LIST.map((k, idx) => `<option value="${idx}">${idx + 1}. ${k.char}（${k.onyomi}）</option>`).join("");
@@ -1360,13 +1699,20 @@
       return {
         init,
         jumpStep: s => { switchTab("learn"); setStep(s); },
-        selectKanji: idx => { kanjiIndex = Number(idx) || 0; loadQuestion(step); },
-        prevKanji: () => { kanjiIndex = (kanjiIndex - 1 + KANJI_LIST.length) % KANJI_LIST.length; loadQuestion(1); },
-        nextKanji: () => { kanjiIndex = (kanjiIndex + 1) % KANJI_LIST.length; loadQuestion(1); },
+        selectKanji: idx => { progress.currentIndex = Number(idx) || 0; saveProgress(); loadQuestion(step); },
+        prevKanji: () => { progress.currentIndex = (progress.currentIndex - 1 + KANJI_LIST.length) % KANJI_LIST.length; saveProgress(); loadQuestion(1); },
+        nextKanji: (countAsDone = false) => {
+          if (countAsDone) return completeAndNext();
+          progress.currentIndex = (progress.currentIndex + 1) % KANJI_LIST.length;
+          saveProgress();
+          loadQuestion(1);
+        },
+        completeAndNext,
+        resetDailyLimit,
         playDemo,
         resetStroke,
         gradeAll,
-        onTabShown: () => { if (step === 2) { setupCanvas(); renderCanvas(); } }
+        onTabShown: () => { updateDailyUI(); if (step === 2) { setupCanvas(); renderCanvas(); } }
       };
     })();
 
@@ -1461,7 +1807,7 @@
       });
     });
 
-    const STORAGE_KEY = "kanji_108_save_v5";
+    const STORAGE_KEY = "kanji_108_save_v6";
 
     function createInitialMonster(speciesId) {
       const sp = SPECIES_108.find(x => x.id === speciesId) || SPECIES_108[0];
