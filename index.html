@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>漢字道場＆百八霊獣伝（小学4年生・教科書体＆本格育成版）</title>
-  <!-- とめ・はね・はらいが分かりやすい教科書体風Webフォント（Klee One） -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&display=swap" rel="stylesheet" />
@@ -23,7 +22,6 @@
       --border-soft: #d8ceba;
       --border-strong: #b9aa8e;
       --shadow-card: 0 6px 20px rgba(29, 38, 51, 0.08);
-      /* 教科書体フォントスタック（とめ・はね・はらい重視） */
       --font-kyokasho: "UD Digi Kyokasho N-R", "UD デジタル 教科書体 N-R", "YuKyokasho", "游教科書体", "Klee One", "Hiragino Mincho ProN", serif;
       --font-ui: "Hiragino Maru Gothic ProN", "BIZ UDPGothic", "Meiryo", sans-serif;
     }
@@ -41,7 +39,6 @@
       min-height: 100vh;
     }
 
-    /* 漢字学習用の教科書体クラス */
     .kyokasho {
       font-family: var(--font-kyokasho) !important;
       font-weight: 600;
@@ -707,7 +704,7 @@
 
   <script>
     // =========================================================================
-    // 独立した漢字学習モジュール（他の機能追加・変更の影響を受けないカプセル化設計）
+    // 独立した漢字学習モジュール（標準筆順ベクター単一描画でズレ完全解消）
     // =========================================================================
     const KanjiModule = (() => {
       const KANJI_LIST = Object.freeze([
@@ -736,14 +733,13 @@
         "生産", "産業", "水産", "畜産", "農産", "産物", "出産", "原産", "特産", "国産", "財産"
       ]);
 
-      // 標準書き順ベクターキャッシュ（KanjiVG SVGデータを自動取得）
       const strokeCache = {};
       let kanjiIndex = 0;
       let step = 1;
       let strokeCanvas = null;
       let strokeCtx = null;
       let canvasSize = 320;
-      let activeStrokes = []; // [{ path2d, points: [{x,y}, ...] }]
+      let activeStrokes = [];
       let currentStrokeIdx = 0;
       let isDrawing = false;
       let userPoints = [];
@@ -758,7 +754,6 @@
         judgeClass: ""
       }));
 
-      // KanjiVG から正規の筆順パス（109x109座標系）を取得して高精度サンプリング
       async function fetchKanjiStrokes(char) {
         if (strokeCache[char]) return strokeCache[char];
         const hex = char.codePointAt(0).toString(16).padStart(5, "0");
@@ -786,7 +781,7 @@
             clone.setAttribute("d", d);
             svgEl.appendChild(clone);
             const totalLen = clone.getTotalLength();
-            const steps = Math.max(12, Math.ceil(totalLen / 3));
+            const steps = Math.max(16, Math.ceil(totalLen / 2.5));
             const pts = [];
             for (let i = 0; i <= steps; i++) {
               const pt = clone.getPointAtLength((totalLen * i) / steps);
@@ -832,14 +827,22 @@
         ctx.restore();
       }
 
-      // 教科書体フォントの正しい字形を薄く背景に敷き、その上に正規筆順を描画
-      function drawKyokashoWatermark(ctx, s, char) {
+      function drawStrokeList(ctx, strokes, toPx, color, lineWidth) {
         ctx.save();
-        ctx.fillStyle = "#ece5d5";
-        ctx.font = `600 ${Math.round(s * 0.78)}px "UD Digi Kyokasho N-R", "UD デジタル 教科書体 N-R", "YuKyokasho", "游教科書体", "Klee One", serif`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(char, s / 2, s / 2 + s * 0.03);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = lineWidth;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        strokes.forEach(st => {
+          const pts = st.pts || st;
+          if (!pts || pts.length === 0) return;
+          ctx.beginPath();
+          pts.forEach((p, idx) => {
+            const q = toPx(p);
+            idx === 0 ? ctx.moveTo(q.x, q.y) : ctx.lineTo(q.x, q.y);
+          });
+          ctx.stroke();
+        });
         ctx.restore();
       }
 
@@ -852,9 +855,16 @@
 
         ctx.clearRect(0, 0, s, s);
         drawGrid(ctx, s);
-        drawKyokashoWatermark(ctx, s, k.char);
 
+        // オフライン等でKanjiVGが取れない場合のみ教科書体フォントを描画
         if (!activeStrokes || activeStrokes.length === 0) {
+          ctx.save();
+          ctx.fillStyle = "#e5dec9";
+          ctx.font = `600 ${Math.round(s * 0.78)}px "UD Digi Kyokasho N-R", "UD デジタル 教科書体 N-R", "YuKyokasho", "游教科書体", "Klee One", serif`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(k.char, s / 2, s / 2 + s * 0.03);
+          ctx.restore();
           document.getElementById("strokeGuideText").textContent = "教科書体の形を見ながら、正しい書き順で書いてみよう！";
           return;
         }
@@ -862,59 +872,27 @@
         const pad = s * 0.09;
         const inner = s - pad * 2;
         const toPx = pt => ({ x: pad + pt.x * inner, y: pad + pt.y * inner });
+        const baseWidth = Math.max(11, s * 0.038);
 
-        // 完了済みの画（藍色）
-        ctx.save();
-        ctx.strokeStyle = "#1f3a5f";
-        ctx.lineWidth = Math.max(9, s * 0.034);
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        for (let i = 0; i < currentStrokeIdx && i < activeStrokes.length; i++) {
-          const pts = activeStrokes[i].pts;
-          ctx.beginPath();
-          pts.forEach((p, idx) => {
-            const q = toPx(p);
-            idx === 0 ? ctx.moveTo(q.x, q.y) : ctx.lineTo(q.x, q.y);
-          });
-          ctx.stroke();
+        // 1. 全体の下絵（薄グレー・ベクター単一座標系なのでズレゼロ）
+        drawStrokeList(ctx, activeStrokes, toPx, "#e4ddd0", baseWidth + 2);
+
+        // 2. すでに書き終えた画（藍色）
+        if (currentStrokeIdx > 0) {
+          drawStrokeList(ctx, activeStrokes.slice(0, currentStrokeIdx), toPx, "#1f3a5f", baseWidth);
         }
-        ctx.restore();
 
-        // お手本再生中
+        // 3. お手本再生中 or 次に書く画のガイド
         if (demoOverride) {
-          ctx.save();
-          ctx.strokeStyle = "#b83a2d";
-          ctx.lineWidth = Math.max(9, s * 0.034);
-          ctx.lineCap = "round";
-          ctx.lineJoin = "round";
-          demoOverride.forEach(pts => {
-            if (!pts || pts.length === 0) return;
-            ctx.beginPath();
-            pts.forEach((p, idx) => {
-              const q = toPx(p);
-              idx === 0 ? ctx.moveTo(q.x, q.y) : ctx.lineTo(q.x, q.y);
-            });
-            ctx.stroke();
-          });
-          ctx.restore();
+          drawStrokeList(ctx, demoOverride, toPx, "#b83a2d", baseWidth);
         } else if (currentStrokeIdx < activeStrokes.length) {
-          // 次の画の薄いガイド線＋緑の始点＆赤の終点
           const curPts = activeStrokes[currentStrokeIdx].pts;
-          ctx.save();
-          ctx.strokeStyle = "rgba(44, 110, 73, 0.25)";
-          ctx.lineWidth = Math.max(10, s * 0.036);
-          ctx.lineCap = "round";
-          ctx.lineJoin = "round";
-          ctx.beginPath();
-          curPts.forEach((p, idx) => {
-            const q = toPx(p);
-            idx === 0 ? ctx.moveTo(q.x, q.y) : ctx.lineTo(q.x, q.y);
-          });
-          ctx.stroke();
+          drawStrokeList(ctx, [curPts], toPx, "rgba(44, 110, 73, 0.28)", baseWidth + 2);
 
           const st = toPx(curPts[0]);
           const ed = toPx(curPts[curPts.length - 1]);
 
+          ctx.save();
           ctx.fillStyle = "#2c6e49";
           ctx.beginPath();
           ctx.arc(st.x, st.y, 13, 0, Math.PI * 2);
@@ -932,11 +910,11 @@
           ctx.restore();
         }
 
-        // ユーザー描画中の軌跡
+        // 4. ユーザーが今なぞっている線
         if (userPoints.length > 1) {
           ctx.save();
           ctx.strokeStyle = "#2c6e49";
-          ctx.lineWidth = Math.max(8, s * 0.03);
+          ctx.lineWidth = Math.max(9, s * 0.032);
           ctx.lineCap = "round";
           ctx.lineJoin = "round";
           ctx.beginPath();
